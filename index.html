@@ -1,0 +1,2340 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Космическая битва — V53</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050713;color:#fff;font-family:Arial,sans-serif;touch-action:none}body:after{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent 45%,#0008 100%);z-index:1}
+canvas{display:block;position:fixed;inset:0;width:100vw!important;height:100vh!important;max-width:none;max-height:none;background:#050713;image-rendering:auto}
+#ui{position:fixed;left:12px;top:10px;font-weight:bold;font-size:17px;z-index:3;text-shadow:0 2px 5px #000}
+#boss{position:fixed;left:12%;right:12%;top:48px;height:14px;border:1px solid #fff6;border-radius:8px;background:#0008;z-index:2}
+#bossHP{height:100%;width:100%;background:linear-gradient(90deg,#ff4d8d,#e64aca,#9f5cff);border-radius:8px;box-shadow:0 0 16px #ff4d8d}
+#shieldInfo{position:fixed;right:12px;top:10px;font-size:14px;z-index:2;text-shadow:0 2px 4px #000}
+#buttons{position:fixed;bottom:15px;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:0 15px;z-index:3}
+.b{width:78px;height:78px;border-radius:50%;border:2px solid #fff5;background:#ffffff1d;color:#fff;display:grid;place-items:center;font-weight:bold;font-size:30px;user-select:none}
+.fire{width:96px;height:96px;font-size:15px;background:#ff476333}
+#upgradeMenu{position:fixed;inset:0;background:#02051dcc;display:none;place-items:center;text-align:center;z-index:8}
+.upCard{width:min(900px,92%);max-height:88vh;overflow:auto;background:radial-gradient(circle at 50% -10%,#4c62b8 0,#202653 28%,#0c1027 72%);padding:30px;border-radius:30px;box-shadow:0 0 90px #55eaff33,0 25px 80px #000b;border:1px solid #ffffff2b;backdrop-filter:blur(18px)}
+.upCard h1{margin:0 0 8px}
+#upgradeChoices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.upChoice{min-height:145px;border:1px solid #ffffff22;border-radius:18px;background:linear-gradient(145deg,#ffffff12,#ffffff05);color:#fff;padding:14px;text-align:left;cursor:pointer;box-shadow:inset 0 1px #fff2,0 8px 24px #0005;transition:.18s;}.upChoice:hover{transform:translateY(-4px);border-color:#64eaff88;background:#ffffff18}
+.upChoice b{display:block;font-size:18px;margin-bottom:8px}
+.upChoice span{font-size:13px;color:#cbd6ff;line-height:1.35}
+@media(max-width:600px){#upgradeChoices{grid-template-columns:1fr}.upChoice{min-height:90px}}
+#end{position:fixed;inset:0;background:#000b;display:none;place-items:center;text-align:center;z-index:9}
+.card{background:radial-gradient(circle at 50% 0,#3a234c,#15162c 65%);padding:34px;border-radius:28px;box-shadow:0 0 70px #ff3b8833;border:1px solid #ffffff22}
+.card h1{margin:0 0 12px}
+.card button{padding:12px 20px;border:0;border-radius:12px;font-weight:bold;font-size:18px}
+
+.upgradeHeader{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}.upgradeHeader .badge{padding:7px 11px;border-radius:999px;background:#ffffff12;border:1px solid #ffffff22;color:#9feeff;font-size:12px;font-weight:800;letter-spacing:.08em}.upgradeTitle{font-size:clamp(25px,5vw,38px);font-weight:950;letter-spacing:-.03em;margin:0;text-shadow:0 4px 22px #0008}.upgradeSub{margin:5px 0 0;color:#b9c8ef;font-size:14px}.upGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.upChoice .upIcon{font-size:38px;display:block;margin-bottom:12px;filter:drop-shadow(0 0 12px #fff3)}.upChoice .upName{font-size:17px;font-weight:900;display:block;margin-bottom:8px}.upChoice .upDesc{font-size:13px;line-height:1.45;color:#b9c6e7;display:block}.upChoice .upTag{position:absolute;right:12px;top:12px;font-size:10px;font-weight:900;color:#8eeaff;background:#3ddcff12;border:1px solid #5ce8ff33;border-radius:999px;padding:5px 8px}@media(max-width:700px){.upCard{padding:20px;border-radius:24px}.upGrid{grid-template-columns:1fr;gap:11px}.upChoice{min-height:112px;padding:15px}.upChoice .upIcon{font-size:30px;display:inline-block;margin:0 10px 0 0}.upChoice .upName{display:inline;font-size:16px}.upChoice .upDesc{margin-top:7px}.upgradeHeader{align-items:flex-start}}
+
+.upCard h2{font-size:clamp(26px,5vw,38px);margin:0 0 6px;font-weight:950;text-shadow:0 3px 18px #0008}.upCard p{color:#b8c5e8}.upCard .upChoice strong{color:#fff}.upCard button{border-radius:14px}
+
+.upGrid.five{grid-template-columns:repeat(5,1fr);gap:12px}.upgradeTopLine{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.choiceCount{font-weight:900;color:#9feeff;background:#55eaff12;border:1px solid #55eaff35;border-radius:999px;padding:8px 12px;font-size:12px}.newAbility{position:absolute;top:10px;left:10px;padding:4px 7px;border-radius:999px;background:#ffd75a18;border:1px solid #ffd75a55;color:#ffe38a;font-size:9px;font-weight:900}.upChoice{min-width:0}.upChoice .upName{line-height:1.15}@media(max-width:900px){.upGrid.five{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.upGrid.five{grid-template-columns:1fr}.upCard{max-height:92vh}}
+.confirmUpgrade{position:fixed;inset:0;display:none;pointer-events:none;align-items:center;justify-content:center;background:#02040dcc;backdrop-filter:blur(10px);z-index:50}.confirmUpgrade.show{display:flex;pointer-events:auto}.confirmBox{width:min(440px,88%);padding:26px;border-radius:26px;background:radial-gradient(circle at 50% 0,#344b91,#11162f 68%);border:1px solid #ffffff2b;box-shadow:0 0 70px #54eaff33,0 25px 80px #000b;text-align:center}.confirmIcon{font-size:54px;filter:drop-shadow(0 0 18px #fff5)}.confirmName{font-size:22px;font-weight:950;margin:8px 0}.confirmDesc{color:#b8c6e8;font-size:14px;line-height:1.45}.confirmBtns{display:flex;gap:10px;margin-top:20px}.confirmBtns button{flex:1;padding:13px;border:0;border-radius:14px;font-weight:900;color:#fff;cursor:pointer}.confirmYes{background:linear-gradient(135deg,#25b5d8,#4868ff);box-shadow:0 0 20px #45dfff33}.confirmNo{background:#ffffff12;border:1px solid #ffffff22!important}@keyframes bossPulse{50%{filter:brightness(1.35) drop-shadow(0 0 28px #ff347d)}}#hudPanel{position:fixed;left:10px;right:10px;top:7px;z-index:4;display:grid;grid-template-columns:auto 1fr auto;align-items:start;pointer-events:none}
+.hudBox{background:linear-gradient(135deg,#07152ddd,#111a3ddd);border:1px solid #72eaff44;border-radius:16px;padding:9px 10px;box-shadow:0 8px 25px #0007, inset 0 1px #fff2;backdrop-filter:blur(12px);min-width:0;width:max-content;max-width:112px}.hudBox:nth-child(2){min-width:150px;justify-self:center;margin:0}.hudBox:nth-child(3){justify-self:end}
+.hudLabel{font-size:10px;color:#8fa7d9;text-transform:uppercase;letter-spacing:.12em;font-weight:900}.hudMain{font-size:16px;font-weight:950;margin-top:3px}.hudSub{font-size:11px;color:#b8c8ef;margin-top:3px}
+#bossPanel{position:fixed;left:8%;right:8%;top:75px;z-index:4;pointer-events:none}.bossName{display:flex;justify-content:space-between;font-size:11px;font-weight:900;color:#ffd0e8;text-shadow:0 2px 4px #000;margin-bottom:5px}
+#boss{position:static!important;height:16px!important;background:#05030b!important;border:1px solid #ff72b844!important;box-shadow:0 0 20px #ff3b8822;overflow:hidden}
+#bossHP{background:linear-gradient(90deg,#ff315f,#ff3bb7,#a35cff)!important;box-shadow:0 0 16px #ff4d9d!important;transition:width .12s}
+#abilityStrip{position:fixed;top:111px;left:8%;right:8%;display:flex;gap:6px;z-index:4;pointer-events:none;overflow:hidden}
+.abilityChip{padding:5px 8px;border-radius:999px;background:#ffffff10;border:1px solid #ffffff20;color:#cfeaff;font-size:10px;font-weight:900;white-space:nowrap;box-shadow:0 4px 14px #0005}
+#upgradeMenu{background:radial-gradient(circle at 50% 10%,#172b66dd,#02030dcc 65%)}
+.upCard{width:min(1050px,94%);padding:22px;background:linear-gradient(145deg,#111d42f2,#080d22f5);border:1px solid #66eaff44}
+.upGrid.five{grid-template-columns:repeat(5,1fr)}
+.upChoice{position:relative;overflow:hidden;background:linear-gradient(145deg,#15244ddd,#0a1028dd);border:1px solid #ffffff18;min-height:165px}
+.upChoice:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle,#53eaff18,transparent 55%);transform:translate(-30%,-30%);pointer-events:none}
+.upChoice:hover{border-color:#67efff99;box-shadow:0 0 28px #3deaff22, inset 0 1px #fff3}
+.upIcon{font-size:34px!important}.upName{color:#fff}.upDesc{color:#b7c8ec!important}
+.choiceCount{font-size:11px}
+#buttons{bottom:12px}.b{box-shadow:0 8px 24px #0007,inset 0 1px #fff3;backdrop-filter:blur(10px)}.fire{box-shadow:0 0 30px #ff476333,0 8px 24px #0008}
+#supportBtn{backdrop-filter:blur(10px)!important;box-shadow:0 0 25px #ff9d3355!important}
+#pacmanBtn{font-size:24px!important;line-height:1!important;backdrop-filter:blur(10px)!important;box-shadow:0 0 25px #ffe34d55!important;left:50%!important;bottom:120px!important;transform:translateX(-50%)!important;width:50px!important;height:50px!important}
+.pacmanGhost{font-size:48px;filter:drop-shadow(0 0 18px #ffe34d)}
+@media(max-width:600px){#hudPanel{gap:4px}.hudBox{min-width:0;padding:7px 9px}.hudBox:nth-child(2){min-width:0;justify-self:center;margin:0}.hudMain{font-size:14px}#bossPanel{left:5%;right:5%;top:74px}#abilityStrip{left:5%;right:5%;top:112px}.upGrid.five{grid-template-columns:1fr}.upChoice{min-height:105px}}
+</style>
+<style id="support-shield-ui">
+#supportBtn{font-size:24px!important;line-height:1!important}#supportHud{margin-top:2px;color:#ffd37a}
+</style>
+<style id="final-controls-ui">
+#settingsBtn{position:fixed;left:8px;top:116px;z-index:3005;width:34px;height:34px;border:1px solid #ffffff33;background:#080c1ccc;color:#fff;border-radius:11px;font-size:19px;font-weight:900;box-shadow:0 5px 16px #0006;backdrop-filter:blur(8px);touch-action:none;pointer-events:auto;user-select:none;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none}
+#settingsPanel{display:none;position:fixed;inset:0;z-index:3000;pointer-events:auto;place-items:center;background:rgba(0,0,0,.72)}
+#settingsBox{width:min(390px,90vw);padding:18px;border-radius:18px;background:#0b1024;color:#fff;border:1px solid #ffffff22;box-shadow:0 20px 70px #000b;font-family:Arial,sans-serif}
+#settingsBox h3{margin:0 0 10px;font-size:20px}.setRow{display:flex;gap:6px;margin-top:8px}.setRow button{flex:1}.setBtn{padding:9px 10px;border:0;border-radius:10px;background:#18244a;color:#fff;font-weight:800}.setBtn.active{background:#3157a8}.setInput{width:100%;box-sizing:border-box;margin:6px 0;padding:10px;border-radius:10px;border:1px solid #39405d;background:#111936;color:#fff}.setHint{font-size:11px;opacity:.7;line-height:1.4;margin-top:7px}
+</style>
+<style id="deep-fps-ui">#upgradeMenu,#confirmUpgrade{backdrop-filter:none!important;-webkit-backdrop-filter:none!important} </style>
+<style id="mp-ui">
+#mpBtn{position:fixed;top:8px;right:8px;z-index:10001;touch-action:manipulation;border:1px solid rgba(255,255,255,.25);background:rgba(8,12,28,.9);color:#fff;border-radius:12px;padding:7px 10px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none;pointer-events:auto}
+#mpPanel{display:none;position:fixed;inset:0;z-index:10000;pointer-events:auto;place-items:center;background:rgba(0,0,0,.78)}
+#mpBox{width:min(360px,90vw);padding:16px;border-radius:16px;background:#0b1024;color:#fff;font-family:Arial,sans-serif}
+#mpBox input{width:100%;box-sizing:border-box;margin:6px 0;padding:9px;border-radius:9px;border:1px solid #39405d;background:#111936;color:#fff}
+#mpBox button{margin:5px 4px 0 0;padding:8px 12px;border:0;border-radius:9px;font-weight:700}
+#mpStatus{font-size:12px;opacity:.8;margin-top:8px;min-height:18px}
+</style>
+
+<style id="coop-camera-ui">
+#coopInfo{position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:55;
+padding:5px 9px;border-radius:10px;background:rgba(8,12,28,.82);color:#fff;
+font:700 11px Arial;display:none;pointer-events:none}
+#reviveInfo{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);z-index:56;padding:6px 10px;border-radius:10px;background:rgba(8,12,28,.88);color:#fff;font:700 12px Arial;display:none;pointer-events:none}#coopP2{position:fixed;display:none;z-index:54;width:28px;height:28px;border-radius:50%;
+border:2px solid #5ee7ff;background:rgba(20,100,130,.75);pointer-events:none;
+box-sizing:border-box}
+</style>
+
+<script id="webrtc-ice-helper">
+(function(){
+  window.__waitIce = function(pc){
+    return new Promise(function(resolve){
+      if(pc.iceGatheringState==="complete"){resolve();return;}
+      var done=false;
+      function finish(){
+        if(done)return; done=true;
+        pc.removeEventListener("icegatheringstatechange",check);
+        resolve();
+      }
+      function check(){if(pc.iceGatheringState==="complete")finish();}
+      pc.addEventListener("icegatheringstatechange",check);
+      setTimeout(finish,5000);
+    });
+  };
+})();
+</script>
+<style id="short-room-code-ui">
+#room,#roomKey,#roomKeyInput,#roomCode,#roomCodeInput{
+  width:170px!important;max-width:48vw!important;
+  height:32px!important;padding:5px 8px!important;
+  font-size:13px!important;letter-spacing:1px!important;
+  box-sizing:border-box!important;text-transform:uppercase!important;
+}
+</style>
+<style id="compact-special-buttons">
+#supportBtn{width:46px!important;height:46px!important;left:31px!important;bottom:98px!important}
+#pacmanBtn{width:46px!important;height:46px!important;left:calc(75% - 50px)!important;bottom:108px!important;transform:none!important}
+@media(max-width:600px){#supportBtn{width:46px!important;height:46px!important;left:31px!important;bottom:98px!important}#pacmanBtn{width:46px!important;height:46px!important;left:calc(75% - 50px)!important;bottom:108px!important}}
+</style>
+<style id="top-cooldowns-v28">#supportHud,#pacmanHud{white-space:nowrap;line-height:1.25;margin-top:2px}#supportHud{color:#ffd37a}#pacmanHud{color:#ffe45a}</style></head>
+<body>
+<button id="supportBtn" type="button" aria-label="Вызвать большой корабль" title="Вызвать корабль" style="display:none;position:fixed;left:31px;bottom:98px;z-index:1000;width:46px;height:46px;padding:0;border:1px solid #ffca66;border-radius:14px;background:#5b3a12;color:#fff;font-size:24px;font-weight:800;box-shadow:0 0 24px #ff9d3344;touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent">🚢</button><button id="pacmanBtn" type="button" aria-label="Вызвать Пакмана" title="Вызвать Пакмана" style="display:none;position:fixed;left:31px;bottom:150px;z-index:1000;width:46px;height:46px;padding:0;border:1px solid #ffe34d;border-radius:14px;background:#51440b;color:#fff;font-size:24px;font-weight:800;box-shadow:0 0 24px #ffe34d44;touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cGF0aCBkPSJNMTAwIDEwMCBMMTg4IDQ4IEExMDAgMTAwIDAgMSAwIDE4OCAxNTIgWiIgZmlsbD0iI0ZGRDkyRiIvPjxjaXJjbGUgY3g9IjExMiIgY3k9IjUyIiByPSIxMiIgZmlsbD0iIzExMSIvPjwvc3ZnPg==" alt="" style="width:30px;height:30px;object-fit:contain;display:block;margin:auto;pointer-events:none"></button>
+<canvas id="c"></canvas>
+<div id="hudPanel">
+  <div class="hudBox"><div class="hudLabel">Счёт</div><div class="hudMain">⚡ <span id="score">0</span></div><div class="hudSub">Комбо ×<span id="scoreMult">1</span></div></div>
+  <div class="hudBox" style="text-align:center"><div class="hudLabel">Корабль</div><div class="hudMain">❤️ <span id="lives">10</span>/<span id="maxLives">10</span></div><div class="hudSub">🛡️ <span id="shield">ГОТОВ</span></div><div class="hudSub supportHud" id="supportHud" style="display:none">🚢 <span id="supportCooldown">ГОТОВ</span></div><div class="hudSub supportHud" id="pacmanHud" style="display:none">🟡 <span id="pacmanCooldown">ГОТОВ</span></div></div>
+  <div class="hudBox" style="text-align:right"><div class="hudLabel">Оружие</div><div class="hudMain">🔫 <span id="weapon">ПУЛИ</span></div><div class="hudSub">Урон ×<span id="damageMult">1.00</span></div></div>
+</div>
+<div id="bossPanel"><div class="bossName"><span>☠️ БОСС</span><span id="bossPercent">100%</span></div><div id="boss"><div id="bossHP"></div></div></div>
+<div id="abilityStrip"></div>
+<div id="shieldInfo" style="display:none"><span id="shieldLegacy">ГОТОВ</span></div>
+<div id="buttons">
+<div class="b" id="left">◀</div>
+<div class="b fire" id="fire">ОГОНЬ</div>
+<div class="b" id="shieldBtn">🛡️</div>
+<div class="b" id="right">▶</div>
+</div>
+<div id="upgradeMenu">
+  <div class="upCard">
+    <h1>✨ ВЫБЕРИ УЛУЧШЕНИЕ</h1>
+    <p id="upgradeHint">50 очков достигнуто!</p>
+    <div id="upgradeChoices"></div>
+  </div>
+</div>
+<div id="end"><div class="card"><h1>💥 МИССИЯ ПРОВАЛЕНА</h1><p>Твой корабль уничтожен.</p><p>Счёт: <b id="final">0</b></p><button onclick="location.reload()">🚀 НОВЫЙ БОЙ</button></div></div>
+
+<script>
+(function(){
+"use strict";
+
+var canvas=document.getElementById("c");
+var ctx=canvas.getContext("2d",{alpha:false});
+var W=1280,H=720,scale=1;
+var viewScale=1,viewLeft=0,viewTop=0;
+
+function resize(){
+  var vw=Math.max(1,window.innerWidth), vh=Math.max(1,window.innerHeight);
+  viewScale=Math.min(vw/W,vh/H);
+  viewLeft=(vw-W*viewScale)*.5;
+  viewTop=(vh-H*viewScale)*.5;
+  scale=Math.min(window.devicePixelRatio||1,1.5);
+  canvas.width=Math.floor(vw*scale);
+  canvas.height=Math.floor(vh*scale);
+  canvas.style.width="100vw";
+  canvas.style.height="100vh";
+  ctx.setTransform(scale,0,0,scale,0,0);
+  rebuildSceneCache();
+}
+
+/* FPS optimization: static space + Earth are rendered once into an offscreen
+   canvas instead of rebuilding gradients, clouds, cities and Earth every frame. */
+var sceneCache=document.createElement("canvas"),sceneCtx=sceneCache.getContext("2d");
+var sceneCacheScale=1;
+function rebuildSceneCache(){
+  sceneCacheScale=scale;
+  sceneCache.width=Math.max(1,Math.floor(W*scale));
+  sceneCache.height=Math.max(1,Math.floor(H*scale));
+  sceneCtx.setTransform(scale,0,0,scale,0,0);
+  sceneCtx.clearRect(0,0,W,H);
+
+  var bg=sceneCtx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,"#01020b");bg.addColorStop(.45,"#09051d");bg.addColorStop(1,"#020817");
+  sceneCtx.fillStyle=bg;sceneCtx.fillRect(0,0,W,H);
+
+  var n1=sceneCtx.createRadialGradient(W*.18,H*.28,5,W*.18,H*.28,W*.55);
+  n1.addColorStop(0,"#5c2a8a44");n1.addColorStop(.45,"#173d7a28");n1.addColorStop(1,"#0000");
+  sceneCtx.fillStyle=n1;sceneCtx.fillRect(0,0,W,H);
+  var n2=sceneCtx.createRadialGradient(W*.84,H*.45,5,W*.84,H*.45,W*.45);
+  n2.addColorStop(0,"#a01c6930");n2.addColorStop(.45,"#28145a22");n2.addColorStop(1,"#0000");
+  sceneCtx.fillStyle=n2;sceneCtx.fillRect(0,0,W,H);
+
+  var earthR=Math.max(W*.47,260), earthX=W*.5, earthY=H+earthR*.72;
+  var eg=sceneCtx.createRadialGradient(earthX-earthR*.3,earthY-earthR*.55,earthR*.1,earthX,earthY,earthR);
+  eg.addColorStop(0,"#318be8");eg.addColorStop(.55,"#1160bd");eg.addColorStop(1,"#061b48");
+  sceneCtx.fillStyle=eg;sceneCtx.beginPath();sceneCtx.arc(earthX,earthY,earthR,0,Math.PI*2);sceneCtx.fill();
+
+  sceneCtx.strokeStyle="#57dfff88";sceneCtx.lineWidth=14;sceneCtx.shadowBlur=25;sceneCtx.shadowColor="#38dfff";
+  sceneCtx.beginPath();sceneCtx.arc(earthX,earthY,earthR-3,Math.PI*1.02,Math.PI*1.98);sceneCtx.stroke();
+  sceneCtx.shadowBlur=0;
+
+  sceneCtx.save();sceneCtx.globalAlpha=.16;sceneCtx.fillStyle="#d9f4ff";
+  for(var cc=0;cc<9;cc++){
+    var cx=earthX+Math.sin(cc*2.7)*earthR*.72;
+    var cy=earthY-earthR*.45+(cc%5)*earthR*.13;
+    sceneCtx.beginPath();sceneCtx.ellipse(cx,cy,earthR*.18,earthR*.035,cc*.5,0,Math.PI*2);sceneCtx.fill();
+  }
+  sceneCtx.restore();
+
+  sceneCtx.save();sceneCtx.beginPath();sceneCtx.arc(earthX,earthY,earthR-5,0,Math.PI*2);sceneCtx.clip();
+  sceneCtx.globalAlpha=.28;sceneCtx.fillStyle="#65d08b";
+  for(var land=0;land<10;land++){
+    var lx=earthX-earthR*.75+(land*earthR*.17)+Math.sin(land*3.1)*earthR*.08;
+    var ly=earthY-earthR*.85+(land%6)*earthR*.14;
+    sceneCtx.beginPath();sceneCtx.ellipse(lx,ly,earthR*.11,earthR*.06,land*.7,0,Math.PI*2);sceneCtx.fill();
+  }
+  sceneCtx.globalAlpha=.18;sceneCtx.fillStyle="#fff";
+  for(var cloud=0;cloud<14;cloud++){
+    var clx=earthX-earthR+((cloud*earthR*.31)%(earthR*2));
+    var cly=earthY-earthR*.8+(cloud%7)*earthR*.11;
+    sceneCtx.beginPath();sceneCtx.ellipse(clx,cly,earthR*.22,earthR*.025,0,0,Math.PI*2);sceneCtx.fill();
+  }
+  sceneCtx.restore();
+
+  sceneCtx.save();sceneCtx.globalCompositeOperation="screen";sceneCtx.fillStyle="#ffd86b";sceneCtx.shadowColor="#ffc94d";sceneCtx.shadowBlur=7;sceneCtx.globalAlpha=.7;
+  for(var city=0;city<36;city++){
+    var ca=city*.91;
+    var cx2=earthX+Math.cos(ca)*earthR*(.72+.1*Math.sin(city));
+    var cy2=earthY+Math.sin(ca)*earthR*.5;
+    if(cy2>earthY-earthR*.2){sceneCtx.beginPath();sceneCtx.arc(cx2,cy2,1+(city%2),0,Math.PI*2);sceneCtx.fill();}
+  }
+  sceneCtx.restore();
+}
+resize();
+window.addEventListener("resize",resize,{passive:true});
+
+
+
+var lowPowerMode=window.matchMedia("(max-width:900px)").matches || (navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4);
+var mobileFX=lowPowerMode;
+var starCount=mobileFX?72:120;
+var sparkLimit=mobileFX?70:130;
+var uiFrameSkip=0;
+function fxShadow(v){return mobileFX?Math.min(7,v*.24):v;}
+function trimEffects(){
+  if(stars.length>starCount)stars.length=starCount;
+  if(sparks.length>sparkLimit)sparks.splice(0,sparks.length-sparkLimit);
+  if(fxRings.length>18)fxRings.splice(0,fxRings.length-18);
+}
+
+var player={x:0,y:0,vx:0};
+  var aimRange=65;
+var drones=[];
+
+  var boss={x:0,y:100,vx:2.05,vy:0,hp:100,max:100};
+// Multiplayer boss smoothing: receive full motion state, not only x/y.
+var remoteBossState={x:0,y:100,vx:0,vy:0,hp:100,max:100,angle:0,targetX:0,targetY:100,receivedAt:0};
+var remoteBossBuffer=[];
+var REMOTE_INTERP_MS=110;
+var REMOTE_BUFFER_MAX=12;
+var bullets=[];
+var enemyBullets=[];
+var sparks=[];
+var stars=[];
+var score=0,lives=10,maxLives=10,weapon=0,beamCharge=0,bigShipTimer=0,bigShipCooldown=0,supportCharges=0,bigShipCount=0,lifeStealHits=0,lifeStealBeamFrames=0;
+var pacmanUnlocked=false,pacmanCharges=0,pacmanCooldown=0,pacmanActive=false,pacmanEating=false,pacmanTimer=0,pacmanEatTimer=0,pacmanStartX=0,pacmanStartY=0,pacmanTargetX=0,pacmanTargetY=0,pacmanRotation=0,pacmanDeathSnapshot=null;
+var bossAlpha=1; var pacmanMoveStartFrame=0,pacmanMoveSpeed=12.5; var pacmanUpgradePending=false,pacmanJustKilledBoss=false; var bossDeathTimer=0,bossDeathFlash=0;
+var supportUnlocked=false,volleyLevel=0,magnetLevel=0,speedBoost=0,explosiveShield=0,miniCount=2,luck=0,upgradeChoices=5,newAbilityChance=.72;
+function ensureSupportReady(){ return supportUnlocked && supportCharges>0 && bigShipCooldown<=0; }
+var supportBtn=document.getElementById("supportBtn");
+if(supportBtn){
+  supportBtn.addEventListener("pointerdown",function(e){
+    e.preventDefault(); e.stopPropagation();
+    if(!ensureSupportReady()) return;
+    supportCharges--;
+    bigShipCount++;
+    bigShipTimer=Math.max(bigShipTimer,600);
+    bigShipCooldown=3600;
+    updateUI(true);
+  },{passive:false});
+  supportBtn.addEventListener("click",function(e){
+    e.preventDefault(); e.stopPropagation();
+  });
+}
+var pacmanBtn=document.getElementById("pacmanBtn");
+if(pacmanBtn){
+  pacmanBtn.addEventListener("pointerdown",function(e){
+    e.preventDefault(); e.stopPropagation();
+    activatePacman();
+  },{passive:false});
+  pacmanBtn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();});
+}
+ var pendingUpgrade=null;
+var damageMult=1,fireRateMult=1,shieldDuration=360,shieldCooldownMax=3600,dodgeChance=0;
+  var critChance=0,critMult=3,thorns=0,regenLevel=0,regenTimer=0,lifeSteal=0,bossSlow=0,orbitalDamage=0,chainShot=0,explosionPower=0,scoreMult=1,extraChoice=0,emergencyShield=0,berserk=0,voidCore=0,prism=0,laserWidth=1;
+var rareEffect={godBurst:0,checkushka:0,airGun:0,freezer:0,poison:0,nuclear:0,fungal:0,timeShot:0};
+var nuclearMutation={type:0,timer:0,changeTimer:0,label:"ОДИНОЧНЫЙ ОГОНЬ"};
+var nuclearMutationNames=["ОДИНОЧНЫЙ ОГОНЬ","ЛЕЧАЩИЕ СНАРЯДЫ","ВОЗВРАЩАЮЩИЕСЯ РАКЕТЫ"];
+var poisonDamage=15, poisonDuration=420, checkushkaDuration=600, airGunDuration=180, freezerDuration=300, nuclearDuration=600, fungalDuration=900;
+var weaponNames=["ПУЛИ","ЛАЗЕР","ТРОЙНОЙ ЛАЗЕР","ПЛАЗМА","КРИСТАЛЬНЫЙ ОСКОЛОК","СВЕРХЛУЧ","ЗВЁЗДНЫЙ РАЗРЯД","РАКЕТНЫЙ РОЙ","ГРАВИТАЦИОННЫЙ РАЗРЫВ","ГИПЕР-ОРУДИЕ"];
+var weaponOrder=[0,1,2,3,4,5,6,8,9,7]; // самонаводящиеся ракеты — последний разблокируемый тип
+var weaponColors=["#ffd43b","#42efff","#8d7bff","#7dff5a","#ff8a35","#ff3bd4","#ffffff","#ff5264","#45b9ff","#fff36b"];
+var droneDamage=0.5,droneRate=65,droneCount=2,droneOrbit=58;
+var abilities={dash:false,magnet:false,overdrive:false};
+var upgradePaused=false,upgradeMilestone=50;
+// Единый менеджер блокирующей UI-паузы. Каждый экран регистрирует собственный источник паузы.
+window.__pauseSources=Object.create(null);
+window.__setUIPause=function(source,active){
+  window.__pauseSources[source]=!!active;
+  var paused=false,k;
+  for(k in window.__pauseSources){if(window.__pauseSources[k]){paused=true;break}}
+  upgradePaused=paused;
+  window.__hardUIPause=paused;
+  window.__sfxPaused=paused;
+  if(paused && window.__stopSfx)window.__stopSfx();
+};
+window.__clearUIPause=function(source){window.__setUIPause(source,false);if(!window.__sfxPaused&&window.__resumeSfx)window.__resumeSfx()};
+
+var frame=0,shotTimer=0,bossTimer=Math.max(28,70-(-1)*4),orbitalTimer=0,shotCounter=0;
+var moveLeft=false,moveRight=false,manualFire=false;
+var dashCooldown=0,dashTapWindow=22,dashLastDir=0,dashLastTapFrame=-9999,dashTimer=0,dashDir=0;
+var shield=false,shieldReady=true,shieldFrames=0,cooldownFrames=0,shieldEndsAt=0;
+var ended=false,upgradeScore=50;
+  damageMult=1;fireRateMult=1;shieldDuration=360;shieldCooldownMax=3600;dodgeChance=0;maxLives=10;droneDamage=.5;droneRate=65;droneCount=2;droneOrbit=58;abilities={dash:false,magnet:false,overdrive:false};
+
+for(var i=0;i<starCount;i++){
+  stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.7+.4,s:Math.random()*.5+.1});
+}
+
+function resetPositions(){
+  player.x=W/2;
+  player.y=H-150; // Игрок чуть выше, как в старых версиях.
+  player.vx=0;
+  boss.x=W/2;
+  dashCooldown=0;
+  dashTimer=0;
+  dashDir=0;
+  dashLastDir=0;
+  dashLastTapFrame=-9999;
+}
+resetPositions();
+drones=[];
+for(var di=0;di<droneCount;di++) drones.push({angle:di*Math.PI,dist:droneOrbit,shot:di*20,phase:di*Math.PI});
+
+function tryDash(dir){
+  if(!abilities.dash || !dir || dashCooldown>0 || dashTimer>0 || ended || upgradePaused || window.__hardUIPause)return false;
+  dashDir=dir;
+  dashTimer=10;
+  dashCooldown=52;
+  player.vx=dir*20;
+  player.x=Math.max(40,Math.min(W-40,player.x+dir*24));
+  spark(player.x,player.y,"#6fe7ff",28);
+  if(window.gameAudio&&window.gameAudio.dash)window.gameAudio.dash();
+  return true;
+}
+function registerMoveTap(dir){
+  var gap=frame-dashLastTapFrame;
+  if(abilities.dash && dashLastDir===dir && gap<=dashTapWindow){
+    tryDash(dir);
+    dashLastTapFrame=-9999;
+  }else{
+    dashLastDir=dir;
+    dashLastTapFrame=frame;
+  }
+}
+
+function button(id,down,up){
+  var el=document.getElementById(id);
+  el.addEventListener("pointerdown",function(e){e.preventDefault();down();});
+  ["pointerup","pointercancel","pointerleave"].forEach(function(type){
+    el.addEventListener(type,function(e){e.preventDefault();up();});
+  });
+}
+button("left",function(){registerMoveTap(-1);moveLeft=true},function(){moveLeft=false});
+button("right",function(){registerMoveTap(1);moveRight=true},function(){moveRight=false});
+button("fire",function(){manualFire=true},function(){manualFire=false});
+button("shieldBtn",function(){activateShield()},function(){});
+
+window.addEventListener("keydown",function(e){
+  var k=e.key.toLowerCase();
+  if((k==="a"||e.key==="ArrowLeft")&&!e.repeat){registerMoveTap(-1);moveLeft=true;}
+  if((k==="d"||e.key==="ArrowRight")&&!e.repeat){registerMoveTap(1);moveRight=true;}
+  if(e.key===" ") {e.preventDefault();manualFire=true}
+  if(k==="e")activateShield();
+});
+window.addEventListener("keyup",function(e){
+  var k=e.key.toLowerCase();
+  if(k==="a"||e.key==="ArrowLeft")moveLeft=false;
+  if(k==="d"||e.key==="ArrowRight")moveRight=false;
+  if(e.key===" ")manualFire=false;
+});
+
+function activatePacman(fromNetwork){
+  if(!pacmanUnlocked || pacmanCharges<=0 || pacmanCooldown>0 || pacmanActive || ended || upgradePaused || window.__hardUIPause)return false;
+  if(window.__coop && window.__coop.on && !window.__coop.host && !fromNetwork){
+    if(window.__mpSendPacman)window.__mpSendPacman();
+    return false;
+  }
+  pacmanCharges--;
+  pacmanCooldown=7200;
+  pacmanActive=true;
+  pacmanEating=false;
+  pacmanEatTimer=0;
+  bossAlpha=1;
+  pacmanTimer=360;
+  pacmanMoveStartFrame=frame;
+  pacmanTargetX=boss.x;
+  pacmanTargetY=boss.y;
+  // Пакман случайно приходит к боссу с одной из четырёх сторон.
+  // Край карты НЕ является препятствием: стартуем за пределами canvas и въезжаем в него.
+  var pacR=72.5,bossR=125;
+  var chosenSide=Math.floor(Math.random()*4);
+  if(chosenSide===0){ // сверху
+    pacmanStartX=boss.x;
+    pacmanStartY=-pacR-30;
+  }else if(chosenSide===1){ // справа
+    pacmanStartX=W+pacR+30;
+    pacmanStartY=boss.y;
+  }else if(chosenSide===2){ // снизу
+    pacmanStartX=boss.x;
+    pacmanStartY=H+pacR+30;
+  }else{ // слева
+    pacmanStartX=-pacR-30;
+    pacmanStartY=boss.y;
+  }
+  pacmanRotation=Math.atan2(pacmanTargetY-pacmanStartY,pacmanTargetX-pacmanStartX);
+  pacmanDeathSnapshot={
+    x:boss.x,y:boss.y,vx:boss.vx,vy:boss.vy,
+    angle:(boss.ai&&Number.isFinite(boss.ai.angle))?boss.ai.angle:0,
+    targetX:(boss.ai&&Number.isFinite(boss.ai.targetX))?boss.ai.targetX:boss.x,
+    targetY:(boss.ai&&Number.isFinite(boss.ai.targetY))?boss.ai.targetY:boss.y,
+    sector:(boss.ai&&Number.isFinite(boss.ai.sector))?boss.ai.sector:0
+  };
+  if(window.__coop&&window.__coop.on&&window.__coop.host&&window.__mpBroadcastPacman)window.__mpBroadcastPacman(pacmanDeathSnapshot);
+  if(window.gameAudio&&window.gameAudio.pacman)window.gameAudio.pacman();
+  updateUI(true);
+  return true;
+}
+function activateShield(){
+  if(ended||shield||!shieldReady)return;
+  shield=true;
+  shieldReady=false;
+  shieldFrames=shieldDuration;
+  shieldEndsAt=performance.now()+(shieldDuration/60)*1000;
+  cooldownFrames=shieldCooldownMax;
+  if(window.gameAudio&&window.gameAudio.shield)window.gameAudio.shield();
+}
+
+function spark(x,y,color,count){
+  var room=Math.max(0,220-sparks.length);
+  count=Math.min(count,room);
+  for(var i=0;i<count;i++){
+    sparks.push({
+      x:x,y:y,
+      vx:(Math.random()-.5)*7,
+      vy:(Math.random()-.5)*7,
+      life:1,color:color
+    });
+  }
+}
+
+// Lightweight special effects: fixed-size ring pool, no per-hit growth.
+var fxRings=[];
+var FX_RING_MAX=18;
+function specialBurst(x,y,color,scale){
+  var ring={x:x,y:y,r:4,max:Math.max(24,scale||46),life:1,color:color};
+  if(fxRings.length<FX_RING_MAX){
+    fxRings.push(ring);
+  }else{
+    var oldest=0,lowest=fxRings[0].life;
+    for(var ri=1;ri<fxRings.length;ri++){
+      if(fxRings[ri].life<lowest){lowest=fxRings[ri].life;oldest=ri;}
+    }
+    fxRings[oldest]=ring;
+  }
+}
+
+function playerDamage(){
+  if(Math.random()<dodgeChance){
+    spark(player.x,player.y,"#9dff67",12);
+    return;
+  }
+  if(shield){
+    spark(player.x,player.y,"#55efff",5);
+    return;
+  }
+  if(emergencyShield>0 && lives<=3){ emergencyShield--; spark(player.x,player.y,"#ffe66d",24); return; }
+  lives--;
+  if(window.gameAudio&&window.gameAudio.playerHit)window.gameAudio.playerHit();
+  if(thorns>0){ boss.hp=Math.max(1,boss.hp-thorns); spark(boss.x,boss.y,"#ff9d45",10); }
+  spark(player.x,player.y,"#ff4264",18);
+  if(lives<=0){
+    lives=0;
+    if(window.__coop && window.__coop.on){
+      window.__coop.dead=true;
+      window.__coop.reviveFrames=0;
+      var ri=document.getElementById("reviveInfo");
+      if(ri){ri.textContent="💀 Ты повержен — союзник может воскресить тебя за 5 сек";ri.style.display="block";}
+    }else{
+      ended=true;
+      document.getElementById("final").textContent=score;
+      document.getElementById("end").style.display="grid";
+    }
+  }
+}
+
+function shoot(){
+  if(shotTimer>0)return;
+  var currentWeapon=weaponOrder[weapon]??weapon;
+  // Единый звук выстрела для любого оружия: вызывается один раз на сам выстрел,
+  // а не отдельно для каждого снаряда. Это также работает для Сверхлуча.
+  if(window.gameAudio&&window.gameAudio.shot)window.gameAudio.shot();
+  if(currentWeapon===0){
+    bullets.push({x:player.x,y:player.y-28,vx:0,vy:-11,power:2*damageMult*(berserk&&lives<=3?2:1)*(Math.random()<critChance?critMult:1),type:0});
+if(window.gameAudio)window.gameAudio.shot();
+    shotTimer=Math.max(5,Math.round(16*fireRateMult));
+  }else if(currentWeapon===1){
+    bullets.push({x:player.x,y:player.y-28,vx:0,vy:-16,power:4*damageMult,type:1});
+    shotTimer=Math.max(4,Math.round(10*fireRateMult));
+  }else if(currentWeapon===2){
+    [-5,0,5].forEach(function(v){bullets.push({x:player.x,y:player.y-28,vx:v,vy:-14,power:4*damageMult,type:2});});
+    shotTimer=Math.max(5,Math.round(12*fireRateMult));
+  }else if(currentWeapon===3){
+    bullets.push({x:player.x,y:player.y-28,vx:0,vy:-17,power:7*damageMult,type:3,r:8});
+    shotTimer=Math.max(3,Math.round(7*fireRateMult));
+  }else if(currentWeapon===4){
+    bullets.push({x:player.x,y:player.y-38,vx:0,vy:-10,power:18*damageMult,type:4,rot:0,life:120});
+    shotTimer=Math.max(18,Math.round(28*fireRateMult));
+  }else if(currentWeapon===5){
+    if(!bullets.some(function(b){return b.type===5;}))
+      bullets.push({x:player.x,y:player.y-20,vx:0,vy:0,power:1.5*damageMult,type:5,life:46,fxTick:0});
+    shotTimer=Math.max(18,Math.round(26*fireRateMult));
+  }else if(currentWeapon===6){
+    bullets.push({x:player.x,y:player.y-55,vx:0,vy:-10,power:26*damageMult,type:6,r:23});
+    shotTimer=Math.max(28,Math.round(40*fireRateMult));
+  }else if(currentWeapon===7){
+    for(var r=0;r<4;r++){
+      var ang=-Math.PI/2+(r-1.5)*.18;
+      bullets.push({x:player.x,y:player.y-25,vx:Math.cos(ang)*4,vy:Math.sin(ang)*8,power:8*damageMult,type:7,r:7,homing:true});
+    }
+    shotTimer=Math.max(24,Math.round(34*fireRateMult));
+  }else if(currentWeapon===8){
+    bullets.push({x:player.x,y:player.y-32,vx:0,vy:-8,power:14*damageMult,type:8,rot:0,life:95,r:1});
+    shotTimer=Math.max(24,Math.round(34*fireRateMult));
+  }else{
+    bullets.push({x:player.x,y:player.y-48,vx:0,vy:-13,power:40*damageMult,type:9,r:27});
+    shotTimer=Math.max(38,Math.round(52*fireRateMult));
+  }
+}
+
+
+function upgradeBadge(u){
+  return u.isNew ? '<span class="newAbility">★ НОВАЯ</span>' : '';
+}
+function askUpgradeConfirm(u){
+  pendingUpgrade=u;
+  window.__setUIPause("upgrade",true);
+  var menu=document.getElementById("upgradeMenu");
+  var box=document.getElementById("confirmUpgrade");
+  if(menu)menu.style.display="none";
+  document.getElementById("confirmIcon").textContent=u.icon||"✨";
+  document.getElementById("confirmName").textContent=u.name||"Способность";
+  document.getElementById("confirmDesc").textContent=u.desc||"Подтвердить выбор способности?";
+  box.classList.add("show");
+}
+function cancelUpgrade(){
+  pendingUpgrade=null;
+  document.getElementById("confirmUpgrade").classList.remove("show");
+  var menu=document.getElementById("upgradeMenu");
+  if(menu)menu.style.display="grid";
+  window.__setUIPause("upgrade",true);
+}
+function confirmUpgrade(){
+  if(!pendingUpgrade)return;
+  var u=pendingUpgrade;
+  markUpgradeObtained(u);
+  pendingUpgrade=null;
+  document.getElementById("confirmUpgrade").classList.remove("show");
+  if(typeof u.apply==="function")u.apply();
+  if(window.gameAudio&&window.gameAudio.upgrade)window.gameAudio.upgrade();
+  var menu=document.getElementById("upgradeMenu");
+  if(menu)menu.style.display="none";
+  window.__clearUIPause("upgrade");
+  updateUI(true);}
+
+
+// Обработчики подтверждения устанавливаются сразу при запуске игры.
+function bindConfirmButtons(){
+  var confirmNoBtn=document.getElementById("confirmNoBtn");
+  var confirmYesBtn=document.getElementById("confirmYesBtn");
+  function bindConfirmButton(el,fn){
+    if(!el || el.dataset.bound==="1")return;
+    el.dataset.bound="1";
+    el.addEventListener("pointerdown",function(e){
+      e.preventDefault();
+      e.stopPropagation();
+    },{passive:false});
+    el.addEventListener("pointerup",function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      fn();
+    },{passive:false});
+  }
+  bindConfirmButton(confirmNoBtn,cancelUpgrade);
+  bindConfirmButton(confirmYesBtn,confirmUpgrade);
+}
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",bindConfirmButtons,{once:true});
+}else{
+  bindConfirmButtons();
+}
+
+
+/* UNIQUE_UPGRADES_SYSTEM */
+var obtainedUniqueAbilities=new Set();
+var veryRareUpgrades=[
+{rarity:"rare",id:"godBurst",icon:"💥",title:"БОЖЕСТВЕННЫЙ ИМПУЛЬС",desc:"Урон ×25 на 3 секунды.",tag:"РЕДКАЯ",repeatable:false,apply:function(){rareEffect.godBurst=180}},
+{rarity:"veryRare",id:"pacman",icon:"🟡",title:"ПАКМАН",desc:"Призывает Пакмана, который полностью съедает босса в одиночном режиме и наносит 50 000 урона боссу в мультиплеере. Перезарядка: 2 минуты.",tag:"СУПЕР РЕДКАЯ",repeatable:false,apply:function(){pacmanUnlocked=true;pacmanCharges++;}},
+{rarity:"rare",id:"checkushka",icon:"🥃",title:"ПРИЗЫВ ЧЕКУШКИ",desc:"10 секунд наносит боссу до 15% его максимального HP.",tag:"РЕДКАЯ",repeatable:false,apply:function(){rareEffect.checkushka=checkushkaDuration}},
+{rarity:"rare",id:"airGun",icon:"💨",title:"ВОЗДУХАН",desc:"Ослабляет босса на 3 секунды; урон +20%.",tag:"РЕДКАЯ",repeatable:false,apply:function(){rareEffect.airGun=airGunDuration}},
+{rarity:"rare",id:"freezer",icon:"❄️",title:"ЗАМОРАЖИВАЮЩИЙ",desc:"Босс не атакует 5 секунд.",tag:"РЕДКАЯ",repeatable:false,apply:function(){rareEffect.freezer=freezerDuration}},
+{rarity:"rare",id:"poison",icon:"☠️",title:"ОТРАВЛЯЮЩИЙ",desc:"15 урона каждую секунду 7 секунд.",tag:"РЕДКАЯ",repeatable:false,apply:function(){rareEffect.poison=poisonDuration}},
+{rarity:"rare",id:"nuclear",icon:"☢️",title:"ЯДЕРНЫЙ",desc:"10 секунд босс получает случайные мутации: одиночный огонь, лечащие снаряды для восстановления игрока или возвращающиеся ракеты.",tag:"РЕДКАЯ",repeatable:true,apply:function(){rareEffect.nuclear=nuclearDuration;setNuclearMutation()}},
+{rarity:"rare",id:"fungal",icon:"🍄",title:"ГРИБНОЙ",desc:"15 секунд босс теряет ориентацию и часто промахивается.",tag:"РЕДКАЯ",repeatable:false,apply:function(){rareEffect.fungal=fungalDuration}},
+{rarity:"rare",id:"timeShot",icon:"⏱️",title:"ВРЕМЕННОЙ",desc:"Снаряд движется на 10% быстрее.",tag:"РЕДКАЯ",repeatable:false,apply:function(){rareEffect.timeShot++}}
+];
+function upgradeKey(u){return String((u&&(u.id||u.key||u.title))||"");}
+function repeatableUpgrade(u){
+  return !!(u && u.repeatable===true);
+}
+function normUpgrade(u){
+  if(!u)return null;
+  // Все карточки используют один и тот же источник иконки. Если старая запись
+  // содержит эмодзи в начале имени, переносим его в icon и убираем из текста.
+  var label=typeof u.name==="string"?u.name:(typeof u.title==="string"?u.title:"");
+  if(!u.icon && label){
+    var trimmed=label.trim();
+    // Считаем иконкой только настоящий emoji/pictograph в самом начале строки,
+    // а не любой Unicode-символ (иначе русская буква могла стать "иконкой").
+    var emojiMatch=trimmed.match(/^(\p{Extended_Pictographic}(?:\uFE0E|\uFE0F)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0E|\uFE0F)?)*)\s*/u);
+    if(emojiMatch){
+      u.icon=emojiMatch[1];
+      var cleanLabel=trimmed.slice(emojiMatch[0].length).trim();
+      if(typeof u.name==="string")u.name=cleanLabel;
+      else if(typeof u.title==="string")u.title=cleanLabel;
+    }
+  }
+  if(!u.icon)u.icon="✨";
+  if(!u.id)u.id=upgradeKey(u)||("u_"+Math.random().toString(36).slice(2));
+  if(/призыв|вызов|большой корабль|big.?ship/i.test(String(u.title||"")))u.repeatable=false;
+  if(u.tag==="")delete u.tag;
+  if(u.rarity==="")delete u.rarity;
+  return u;
+}
+function markUpgradeObtained(u){
+  u=normUpgrade(u);
+  if(u&&!repeatableUpgrade(u))obtainedUniqueAbilities.add(upgradeKey(u));
+}
+
+// Старые генераторы улучшений удалены: используется только единый генератор showUpgradeMenu().
+
+function randomUpgradePool(){
+  return [
+    {name:"⚡ Скорострельность",repeatable:true,desc:"Корабль стреляет на 25% чаще.",apply:function(){fireRateMult*=.75}},
+    {name:"💥 Усиленные пушки",repeatable:true,desc:"Урон оружия +35%.",apply:function(){damageMult*=1.35}},
+    {name:"🛡️ Быстрая перезарядка",desc:"Щит перезаряжается на 20 секунд быстрее.",apply:function(){shieldCooldownMax=Math.max(1800,shieldCooldownMax-1200)}},
+    {name:"🍀 Шанс уклонения",desc:"Получаешь 15% шанс полностью избежать урона.",apply:function(){dodgeChance=Math.min(.75,dodgeChance+.15)}},
+    {name:"❤️ Дополнительные сердца",repeatable:true,desc:"Случайно даёт +1–5 к максимальному и текущему здоровью.",apply:function(){var n=1+Math.floor(Math.random()*5);maxLives+=n;lives+=n}},
+    {name:"🔵 Долгий щит",desc:"Щит действует на 2 секунды дольше.",apply:function(){shieldDuration+=120}},
+    {name:"🌀 Рывок",desc:"Открывает способность: двойное нажатие движения даёт резкий рывок.",apply:function(){abilities.dash=true}},
+    {name:"🧲 Притяжение",desc:"Очки за уничтожение босса увеличиваются на 50%.",repeatable:false,apply:function(){abilities.magnet=true;magnetLevel++;scoreMult*=1.5}},
+    {name:"🔥 Перегрузка",desc:"На 5 секунд после попаданий оружие стреляет быстрее.",apply:function(){abilities.overdrive=true}},
+    {name:"🛸 Двойной дрон",repeatable:true,desc:"Добавляет ещё один бессмертный мини-корабль.",apply:function(){
+      droneCount++;
+      drones.push({angle:Math.random()*Math.PI*2,dist:droneOrbit,shot:15,phase:Math.random()*6});
+    }},
+    {name:"🛸 Дроны: урон",repeatable:true,desc:"Мини-корабли наносят на 75% больше урона.",apply:function(){droneDamage*=1.75}},
+    {name:"🛸 Дроны: огонь",repeatable:true,desc:"Мини-корабли стреляют на 35% чаще.",apply:function(){droneRate=Math.max(25,droneRate*.65)}},
+    {name:"🛸 Орбитальная скорость",desc:"Мини-корабли быстрее вращаются вокруг игрока.",apply:function(){droneOrbit+=10}},
+    {name:"💚 Ремонт",desc:"Восстанавливает 3 сердца прямо сейчас.",apply:function(){lives=Math.min(maxLives,lives+3)}},
+    {name:"🚢 Большой корабль",isNew:true,desc:"Даёт ещё один заряд вызова союзного корабля на 10 секунд. Заряды складываются.",apply:function(){supportUnlocked=true;supportCharges++;bigShipCooldown=0}},
+    {name:"💥 Двойной залп",isNew:true,desc:"Каждый выстрел выпускает дополнительный снаряд.",apply:function(){volleyLevel++}},
+    {name:"⚡ Турбо-движение",isNew:true,desc:"Корабль становится быстрее на 35%.",apply:function(){speedBoost++}},
+    {name:"🌌 Космический барьер",isNew:true,repeatable:false,desc:"Часть ближайших вражеских снарядов уничтожается.",apply:function(){explosiveShield++}},
+    {name:"🧲 Магнит энергии",isNew:true,repeatable:false,desc:"Увеличивает награды и очки за босса.",apply:function(){magnetLevel++;scoreMult*=1.5}},
+    {name:"🍀 Удача",isNew:true,desc:"Повышает шанс появления редких новых способностей.",apply:function(){luck++}},
+    {name:"🔋 Энергия щита",isNew:true,desc:"Щит действует ещё 3 секунды.",apply:function(){shieldDuration+=180}},
+    {name:"🛡️ Непробиваемая броня",isNew:true,desc:"Даёт ещё 10% шанса полностью избежать урона.",apply:function(){dodgeChance=Math.min(.8,dodgeChance+.10)}},
+    {name:"🤖 Рой дронов",isNew:true,desc:"Добавляет два бессмертных мини-корабля.",apply:function(){droneCount+=2;for(var z=0;z<2;z++)drones.push({angle:Math.random()*Math.PI*2,dist:droneOrbit,shot:15,phase:Math.random()*6})}},
+    {name:"🔥 Дроны-ветераны",isNew:true,desc:"Урон мини-кораблей увеличивается вдвое.",apply:function(){droneDamage*=2}},
+    {name:"💨 Дроны-турбо",isNew:true,desc:"Мини-корабли стреляют значительно чаще.",apply:function(){droneRate=Math.max(15,droneRate*.55)}},
+    {name:"🔮 Сингулярность",isNew:true,desc:"Урон всех оружий увеличивается ещё на 50%.",apply:function(){damageMult*=1.5}},
+    {name:"⚔️ Охотник на босса",isNew:true,desc:"Все попадания по боссу получают ещё 25% урона.",apply:function(){damageMult*=1.25}},
+    {name:"🌠 Звёздный импульс",isNew:true,desc:"Мгновенно даёт 40 очков.",apply:function(){score+=40}},
+    {name:"⏱️ Замедление времени",isNew:true,desc:"Вражеские снаряды замедляются.",apply:function(){for(var eb=0;eb<enemyBullets.length;eb++){enemyBullets[eb].vx*=.55;enemyBullets[eb].vy*=.55}}},
+    {name:"💜 Плазменное ядро",isNew:true,desc:"Плазменное оружие получает ещё 60% урона.",apply:function(){damageMult*=1.6}},
+    {name:"🌟 Редкая технология",isNew:true,desc:"Следующий выбор сильнее склоняется к новым способностям.",apply:function(){newAbilityChance=Math.min(.98,newAbilityChance+.2)}},
+    {name:"🎯 Критический удар",isNew:true,desc:"8% шанс нанести тройной урон.",apply:function(){critChance=Math.min(.6,critChance+.08)}},
+    {name:"🩸 Вампиризм",isNew:true,desc:"Восстанавливает здоровье за нанесённый урон.",apply:function(){lifeSteal++;lifeStealHits=0;lifeStealBeamFrames=0}},
+    {name:"🌿 Автовосстановление",isNew:true,desc:"Восстанавливает здоровье каждые 10 секунд.",apply:function(){regenLevel++}},
+    {name:"🔥 Берсерк",isNew:true,desc:"При 3 или меньше сердцах урон увеличивается вдвое.",apply:function(){berserk++}},
+    {name:"💣 Взрывной боезапас",isNew:true,desc:"Попадания наносят дополнительный взрывной урон.",apply:function(){explosionPower+=6}},
+    {name:"🔗 Цепная молния",isNew:true,desc:"Попадания иногда выпускают дополнительный разряд.",apply:function(){chainShot++}},
+    {name:"🌈 Призматическое ядро",isNew:true,desc:"Урон +25% и красивые спектральные эффекты.",apply:function(){prism++;damageMult*=1.25}},
+    {name:"🌑 Ядро пустоты",isNew:true,desc:"Урон +60%, но стрельба немного медленнее.",apply:function(){voidCore++;damageMult*=1.6;fireRateMult*=1.15}},
+    {name:"🌀 Гравитационный удар",isNew:true,desc:"Замедляет движение босса.",apply:function(){bossSlow+=.12}},
+    {name:"🪐 Орбитальный огонь",isNew:true,desc:"Добавляет энергетический шар, атакующий босса.",apply:function(){orbitalDamage++}},
+    {name:"📡 Точный прицел",isNew:true,desc:"Автоогонь работает при большем отклонении от центра.",apply:function(){aimRange+=35}},
+    {name:"💎 Кристалл щита",isNew:true,desc:"Щит становится значительно дольше.",apply:function(){shieldDuration+=180}},
+    {name:"🚨 Аварийный щит",isNew:true,desc:"Один смертельно опасный удар автоматически блокируется.",apply:function(){emergencyShield++}},
+    {name:"🧨 Реактор возмездия",isNew:true,desc:"После получения урона наносит ответный удар боссу.",apply:function(){thorns+=8}},
+    {name:"🌟 Золотой поток",isNew:true,desc:"Получаемые очки увеличиваются на 50%.",apply:function(){scoreMult*=1.5}},
+    {name:"🎲 Дополнительный выбор",isNew:true,desc:"В каждом следующем меню появляется ещё один вариант выбора. Эффект складывается.",apply:function(){extraChoice++}},
+    {name:"⚡ Сверхзаряд",isNew:true,desc:"Урон оружия увеличивается на 80%.",apply:function(){damageMult*=1.8}},
+    {name:"🛸 Эскадрилья",isNew:true,desc:"Добавляет сразу 3 бессмертных мини-корабля.",apply:function(){for(var z=0;z<3;z++){droneCount++;drones.push({angle:Math.random()*Math.PI*2,dist:droneOrbit,shot:10,phase:Math.random()*6})}}},
+    {name:"👑 Императорский дрон",isNew:true,desc:"Все мини-корабли получают +150% урона.",apply:function(){droneDamage*=2.5}},
+    {name:"🌈 Спектральный залп",isNew:true,desc:"Скорострельность +15%, урон +20%.",apply:function(){fireRateMult*=.85;damageMult*=1.2}},
+    {name:"🧬 Эволюция",isNew:true,desc:"Немного усиливает сразу несколько параметров.",apply:function(){damageMult*=1.1;fireRateMult*=.9;dodgeChance=Math.min(.8,dodgeChance+.03);droneDamage*=1.1}},
+    {name:"⚡ Электро-резонанс",isNew:true,desc:"Каждый 6-й выстрел выпускает дополнительный энергетический импульс.",apply:function(){chainShot+=2}},
+    {name:"🔷 Квантовый залп",isNew:true,desc:"Каждый залп получает ещё один быстрый снаряд.",apply:function(){volleyLevel+=2}},
+    {name:"🛡️ Фазовая защита",isNew:true,desc:"+12% к шансу полностью избежать попадания.",apply:function(){dodgeChance=Math.min(.8,dodgeChance+.12)}},
+    {name:"💚 Наноремонт",isNew:true,desc:"Медленно восстанавливает здоровье каждые 5 секунд.",apply:function(){regenLevel+=2}},
+    {name:"🔥 Реактор ярости",isNew:true,desc:"При низком здоровье урон увеличивается ещё на 50%.",apply:function(){berserk+=2}},
+    {name:"💎 Энергетический кристалл",isNew:true,desc:"Урон +30%, скорострельность +10%.",apply:function(){damageMult*=1.3;fireRateMult*=.9}},
+    {name:"🛸 Резервный дрон",isNew:true,desc:"Добавляет ещё один бессмертный мини-корабль.",apply:function(){droneCount++;drones.push({angle:Math.random()*Math.PI*2,dist:droneOrbit,shot:10,phase:Math.random()*6})}},
+    {name:"🌟 Перегрузка ядра",isNew:true,desc:"Все текущие усиления урона получают дополнительный множитель ×1.15.",apply:function(){damageMult*=1.15}}
+  ];
+}
+function setNuclearMutation(forceType){
+  var t=(forceType===undefined)?Math.floor(Math.random()*3):Math.max(0,Math.min(2,forceType));
+  nuclearMutation.type=t;
+  nuclearMutation.timer=120;
+  nuclearMutation.changeTimer=120;
+  nuclearMutation.label=nuclearMutationNames[t];
+  spark(boss.x,boss.y,t===0?"#fff36b":(t===1?"#62ff86":"#ff6b4d"),24);
+}
+function updateNuclearMutation(){
+  if(rareEffect.nuclear<=0){nuclearMutation.timer=0;return;}
+  nuclearMutation.changeTimer--;
+  if(nuclearMutation.changeTimer<=0){
+    var next=Math.floor(Math.random()*3);
+    if(next===nuclearMutation.type)next=(next+1)%3;
+    setNuclearMutation(next);
+  }
+  nuclearMutation.timer=Math.max(0,nuclearMutation.timer-1);
+}
+function spawnNuclearShot(type){
+  var a=Math.atan2(player.y-boss.y,player.x-boss.x);
+  if(type===0){
+    enemyBullets.push({x:boss.x,y:boss.y+30,vx:Math.cos(a)*3.15,vy:Math.sin(a)*3.15,kind:"nuclearSingle",life:180});
+  }else if(type===1){
+    enemyBullets.push({x:boss.x,y:boss.y+30,vx:Math.cos(a)*2.7,vy:Math.sin(a)*2.7,kind:"nuclearHeal",life:115,phase:0,heal:Math.max(45,boss.max*.035)});
+  }else{
+    enemyBullets.push({x:boss.x,y:boss.y+30,vx:Math.cos(a)*3.4,vy:Math.sin(a)*3.4,kind:"nuclearRocket",life:150,phase:0,damage:Math.max(55,boss.max*.045)});
+  }
+}
+function showUpgradeMenu(){
+  window.__setUIPause("upgrade",true);
+  var menu=document.getElementById("upgradeMenu");
+  var box=document.getElementById("upgradeChoices");
+  if(!menu||!box)return;
+  box.innerHTML="";
+  var choiceCount=Math.min(10,5+Math.max(0,extraChoice|0));
+
+  // Чёткие категории: обычные 70%, новые/необычные 20%, редкие 8%, очень редкие 2%.
+  // Вероятности применяются к каждому слоту меню, а не к суммарному весу пула.
+  var common=randomUpgradePool().filter(function(u){return !u.isNew;}).map(normUpgrade).filter(function(u){
+    return u && (repeatableUpgrade(u)||!obtainedUniqueAbilities.has(upgradeKey(u)));
+  });
+  var uncommon=randomUpgradePool().filter(function(u){return !!u.isNew;}).map(normUpgrade).filter(function(u){
+    return u && (repeatableUpgrade(u)||!obtainedUniqueAbilities.has(upgradeKey(u)));
+  });
+  var rare=veryRareUpgrades.filter(function(u){return !obtainedUniqueAbilities.has(upgradeKey(u));}).map(function(u){return normUpgrade(Object.assign({},u,{isRare:true,rarity:u.rarity||"rare"}));});
+  var superRare=rare.filter(function(u){return u.id==="pacman";});
+  var veryRare=rare.filter(function(u){return u.id==="godBurst";});
+  rare=rare.filter(function(u){return u.id!=="godBurst"&&u.id!=="pacman";});
+  var PACMAN_CHANCE=0.01;
+
+  function shuffle(a){return a.slice().sort(function(){return Math.random()-.5;});}
+  common=shuffle(common); uncommon=shuffle(uncommon); rare=shuffle(rare); veryRare=shuffle(veryRare);
+  var chosen=[],used=new Set();
+
+  function addFrom(pool){
+    if(!pool||!pool.length)return false;
+    for(var i=0;i<pool.length;i++){
+      var u=pool[i],id=upgradeKey(u);
+      if(!used.has(id)){used.add(id);chosen.push(u);return true;}
+    }
+    return false;
+  }
+  function weightedCategory(){
+    var r=Math.random();
+    if(r<PACMAN_CHANCE && superRare.length)return superRare;
+    if(r<0.03 && veryRare.length)return veryRare;
+    if(r<0.11 && rare.length)return rare;
+    if(r<0.31 && uncommon.length)return uncommon;
+    if(common.length)return common;
+    if(uncommon.length)return uncommon;
+    if(rare.length)return rare;
+    return veryRare.length?veryRare:superRare;
+  }
+
+  // Удача и newAbilityChance мягко сдвигают вероятность, но не отменяют редкость.
+  var luckBoost=Math.min(.10,luck*.015);
+  var newBoost=Math.max(-.08,Math.min(.08,(newAbilityChance-.72)*.35));
+  for(var slot=0;slot<choiceCount;slot++){
+    var category=weightedCategory();
+    // При высоком бонусе новых способностей иногда повторно выбираем категорию uncommon.
+    if(Math.random()<luckBoost+newBoost && uncommon.length)category=uncommon;
+    if(!addFrom(category)){
+      if(!addFrom(common)&&!addFrom(uncommon)&&!addFrom(rare)&&!addFrom(veryRare)&&!addFrom(superRare))break;
+    }
+  }
+
+  // Добор без нарушения уникальности; добор НЕ превращает редкие способности в частые.
+  var allFallback=shuffle(common.concat(uncommon));
+  for(var fi=0;fi<allFallback.length&&chosen.length<choiceCount;fi++)addFrom([allFallback[fi]]);
+
+  box.parentElement && box.parentElement.classList.add("five");
+  chosen.forEach(function(up){
+    var b=document.createElement("button");
+    b.className="upChoice";
+    var rareTag=(up.rarity==="rare"||up.isRare)?'<span class="upTag">★ РЕДКАЯ</span>':(up.isNew?'<span class="upTag">★ НОВАЯ</span>':'');
+    b.innerHTML='<span class="upIcon">'+String(up.icon||'✨')+'</span><span class="upName">'+(up.name||up.title||'Способность')+'</span><span class="upDesc">'+(up.desc||'')+'</span>'+rareTag;
+    b.onclick=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      askUpgradeConfirm(up);
+    };
+    box.appendChild(b);
+  });
+  menu.style.display="grid";
+}
+var uiTick=0,uiCache={};
+function updateUI(force){
+  if(!force && (++uiTick%6)!==0)return;
+
+  document.getElementById("score").textContent=score;
+  document.getElementById("lives").textContent=lives;
+  document.getElementById("maxLives").textContent=maxLives;
+  document.getElementById("weapon").textContent=weaponNames[weaponOrder[weapon]??weapon]||"ОРУЖИЕ";
+  document.getElementById("damageMult").textContent=(damageMult*(berserk&&lives<=3?2:1)).toFixed(2);
+  document.getElementById("scoreMult").textContent=scoreMult.toFixed(1);
+  document.getElementById("bossPercent").textContent=Math.max(0,Math.round(100*boss.hp/boss.max))+"%";
+  var strip=document.getElementById("abilityStrip");
+  var chips=[];
+  if(dodgeChance)chips.push("🍀 Уклонение "+Math.round(dodgeChance*100)+"%");
+  if(droneCount>2)chips.push("🛸 Дроны ×"+droneCount);
+  if(critChance)chips.push("🎯 Крит "+Math.round(critChance*100)+"%");
+  if(regenLevel)chips.push("🌿 Реген");
+  if(berserk)chips.push("🔥 Берсерк");
+  if(orbitalDamage)chips.push("🪐 Орбита");
+  if(explosionPower)chips.push("💣 Взрыв");
+  if(chainShot)chips.push("🔗 Цепь");
+  if(prism)chips.push("🌈 Призма");
+  if(voidCore)chips.push("🌑 Пустота");
+  if(supportUnlocked)chips.push("🚢 Поддержка");
+  if(pacmanUnlocked)chips.push("🟡 Пакман");
+  if(rareEffect.godBurst)chips.push("💥 Импульс"); if(rareEffect.checkushka)chips.push("🥃 Чекушка"); if(rareEffect.airGun)chips.push("💨 Воздухан"); if(rareEffect.freezer)chips.push("❄️ Заморозка"); if(rareEffect.poison)chips.push("☠️ Яд"); if(rareEffect.nuclear)chips.push("☢️ Ядерный"); if(rareEffect.fungal)chips.push("🍄 Грибной"); if(rareEffect.timeShot)chips.push("⏱️ Время");
+  strip.innerHTML=chips.slice(0,8).map(function(x){return '<span class="abilityChip">'+x+'</span>';}).join("");
+  var supportEl=document.getElementById("supportBtn");
+  if(supportEl){supportEl.style.display=(supportUnlocked&&supportCharges>0&&bigShipCooldown<=0)?"block":"none";}
+  var pacmanEl=document.getElementById("pacmanBtn");
+  if(pacmanEl){pacmanEl.style.display=(pacmanUnlocked&&pacmanCharges>0&&pacmanCooldown<=0&&!pacmanActive)?"block":"none";}
+  var supportHud=document.getElementById("supportHud"),supportCd=document.getElementById("supportCooldown");
+  if(supportHud&&supportCd){supportHud.style.display=supportUnlocked?"block":"none";supportCd.textContent=bigShipCooldown>0?Math.ceil(bigShipCooldown/60)+"с":"ГОТОВ";}
+  var pacmanHud=document.getElementById("pacmanHud"),pacmanCd=document.getElementById("pacmanCooldown");
+  if(pacmanHud&&pacmanCd){pacmanHud.style.display=pacmanUnlocked?"block":"none";pacmanCd.textContent=pacmanActive?"ЕСТ":(pacmanCooldown>0?Math.ceil(pacmanCooldown/60)+"с":"ГОТОВ");}
+  document.getElementById("bossHP").style.width=(100*boss.hp/boss.max)+"%";
+  var shieldEl=document.getElementById("shield");
+  shieldEl.classList.remove("shieldEnding");
+  if(shield)shieldEl.textContent="АКТИВЕН";
+  else if(shieldReady)shieldEl.textContent="ГОТОВ";
+  else shieldEl.textContent=Math.ceil(cooldownFrames/60)+"с";
+}
+
+function drawBigSupportShip(){
+  if(!supportUnlocked||bigShipTimer<=0)return;
+  var x=W*.5+Math.sin(frame*.025)*W*.3, y=70+Math.sin(frame*.018)*18;
+  ctx.save();ctx.translate(x,y);
+  ctx.shadowBlur=fxShadow(35);ctx.shadowColor="#ffb84a";
+  ctx.fillStyle="#9a6a35";
+  ctx.beginPath();ctx.moveTo(0,-34);ctx.lineTo(-82,24);ctx.lineTo(-38,18);ctx.lineTo(0,32);ctx.lineTo(38,18);ctx.lineTo(82,24);ctx.closePath();ctx.fill();
+  ctx.fillStyle="#ffbd55";
+  ctx.beginPath();ctx.moveTo(0,-25);ctx.lineTo(-58,18);ctx.lineTo(0,10);ctx.lineTo(58,18);ctx.closePath();ctx.fill();
+  ctx.fillStyle="#dffaff";ctx.beginPath();ctx.ellipse(0,-8,22,16,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#42efff";ctx.beginPath();ctx.ellipse(0,-8,14,10,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#ff6b35";ctx.shadowColor="#ff6b35";
+  ctx.beginPath();ctx.arc(-28,27,8+Math.sin(frame*.4)*2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(28,27,8+Math.sin(frame*.4)*2,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+function drawDetailedBoss(){
+  if(!boss)return;
+  ctx.save();
+  ctx.translate(boss.x,boss.y);
+  var pulse=1+Math.sin(frame*.08)*.035;
+  ctx.scale(pulse,pulse);
+  ctx.shadowBlur=fxShadow(30);ctx.shadowColor="#ff2f79";
+  // Outer energy halo.
+  ctx.globalAlpha=.16;
+  ctx.fillStyle="#ff347d";
+  ctx.beginPath();ctx.ellipse(0,0,105,62,0,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+  // Main armored hull.
+  ctx.fillStyle="#32162f";
+  ctx.beginPath();ctx.moveTo(0,-48);ctx.lineTo(-92,-10);ctx.lineTo(-70,30);ctx.lineTo(-30,20);ctx.lineTo(0,40);ctx.lineTo(30,20);ctx.lineTo(70,30);ctx.lineTo(92,-10);ctx.closePath();ctx.fill();
+  ctx.strokeStyle="#ff4b91";ctx.lineWidth=3;ctx.stroke();
+  // Armor plates.
+  ctx.fillStyle="#6b214f";
+  ctx.beginPath();ctx.moveTo(-80,-8);ctx.lineTo(-28,-24);ctx.lineTo(-18,13);ctx.lineTo(-60,24);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(80,-8);ctx.lineTo(28,-24);ctx.lineTo(18,13);ctx.lineTo(60,24);ctx.closePath();ctx.fill();
+  // Central cockpit/core.
+  ctx.shadowBlur=fxShadow(22);ctx.shadowColor="#ff8bd0";
+  ctx.fillStyle="#160d20";
+  ctx.beginPath();ctx.ellipse(0,-8,27,31,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#ff5db5";
+  ctx.beginPath();ctx.ellipse(0,-8,17,22,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#ffd5ef";
+  ctx.beginPath();ctx.ellipse(-5,-14,7,11,-.2,0,Math.PI*2);ctx.fill();
+  // Side cannons.
+  ctx.fillStyle="#b93a78";
+  ctx.fillRect(-82,-5,25,10);ctx.fillRect(57,-5,25,10);
+  ctx.fillStyle="#ffb3dc";
+  ctx.fillRect(-91,-2,10,4);ctx.fillRect(81,-2,10,4);
+  // Engine vents.
+  ctx.shadowColor="#8b4dff";
+  ctx.fillStyle="#7d55ff";
+  for(var q=-1;q<=1;q++){
+    ctx.beginPath();ctx.arc(q*34,30,7+Math.sin(frame*.15+q)*2,0,Math.PI*2);ctx.fill();
+  }
+  // Rotating energy ring.
+  ctx.globalAlpha=.7;ctx.strokeStyle="#ff69c1";ctx.lineWidth=2;
+  ctx.setLineDash([8,7]);ctx.lineDashOffset=-frame*.5;
+  ctx.beginPath();ctx.ellipse(0,0,103,57,0,0,Math.PI*2);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+function drawDetailedBossFinal(){
+  if(!boss || bossDeathTimer>0)return;
+  ctx.save();
+  var mutActive=rareEffect.nuclear>0;
+  var mutJitter=mutActive?(Math.sin(frame*.9)*1.8):0;
+  ctx.translate(boss.x+mutJitter,boss.y+Math.cos(frame*1.15)*mutActive*1.4);
+  if(mutActive){
+    var mutColor=nuclearMutation.type===0?"#fff36b":(nuclearMutation.type===1?"#62ff86":"#ff6b4d");
+    ctx.save();ctx.globalAlpha=.22+Math.sin(frame*.22)*.05;ctx.shadowBlur=fxShadow(38);ctx.shadowColor=mutColor;ctx.strokeStyle=mutColor;ctx.lineWidth=6;
+    ctx.beginPath();ctx.ellipse(0,0,158+Math.sin(frame*.17)*8,82+Math.cos(frame*.14)*5,0,0,Math.PI*2);ctx.stroke();
+    ctx.globalAlpha=.14;ctx.fillStyle=mutColor;ctx.beginPath();ctx.ellipse(0,0,150,88,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.save();ctx.globalAlpha=.8;ctx.fillStyle=mutColor;ctx.font="900 11px Arial";ctx.textAlign="center";ctx.fillText("☢️ "+nuclearMutation.label,0,-94+Math.sin(frame*.25)*3);ctx.restore();
+  }
+  // При поедании альфа применяется ко всему кораблю, включая корпус, а не только к ореолу.
+  ctx.globalAlpha=bossAlpha;
+  var p=1+Math.sin(frame*.08)*.025;ctx.scale(p,p);
+  ctx.shadowBlur=fxShadow(35);ctx.shadowColor="#ff267a";
+  ctx.globalAlpha=bossAlpha*.18;ctx.fillStyle="#ff267a";
+  ctx.beginPath();ctx.ellipse(0,0,145,88,0,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=bossAlpha;
+  ctx.fillStyle="#21142d";ctx.strokeStyle="#ff4b91";ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(0,-68);ctx.lineTo(-125,-18);ctx.lineTo(-94,45);ctx.lineTo(-40,28);ctx.lineTo(0,55);ctx.lineTo(40,28);ctx.lineTo(94,45);ctx.lineTo(125,-18);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle="#612050";
+  [[-62,-5,-28,22],[62,-5,28,22]].forEach(function(q){
+    ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.lineTo(q[0]+(q[2]>0?28:-28),-25);ctx.lineTo(q[0]+(q[2]>0?42:-42),18);ctx.lineTo(q[0]+(q[2]>0?8:-8),q[3]);ctx.closePath();ctx.fill();
+  });
+  ctx.shadowBlur=24;ctx.shadowColor="#ff76c9";ctx.fillStyle="#120b1d";
+  ctx.beginPath();ctx.ellipse(0,-8,30,34,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#ff4fae";ctx.beginPath();ctx.ellipse(0,-8,18,24,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#ffe0f3";ctx.beginPath();ctx.ellipse(-5,-14,7,11,-.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#c33d7e";ctx.fillRect(-94,-5,30,10);ctx.fillRect(64,-5,30,10);
+  ctx.fillStyle="#ffb7dc";ctx.fillRect(-100,-2,9,4);ctx.fillRect(91,-2,9,4);
+  ctx.shadowColor="#7d55ff";ctx.fillStyle="#7d55ff";
+  for(var q=-1;q<=1;q++){ctx.beginPath();ctx.arc(q*35,31,7+Math.sin(frame*.15+q)*2,0,Math.PI*2);ctx.fill();}
+  ctx.globalAlpha=.8;ctx.strokeStyle="#ff7acb";ctx.lineWidth=2;
+  ctx.setLineDash([9,7]);ctx.lineDashOffset=-frame*.6;
+  ctx.beginPath();ctx.ellipse(0,0,138,72,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+  ctx.restore();
+}
+
+
+function drawPacman(){
+  var x=pacmanStartX,y=pacmanStartY;
+  var pacR=72.5;
+  var dx=pacmanTargetX-x,dy=pacmanTargetY-y;
+  var len=Math.hypot(dx,dy)||1;
+  var fx=dx/len, fy=dy/len;          // forward: mouth direction
+  var sx=-fy, sy=fx;                 // screen-right relative to forward
+  var bob=pacmanEating?0:Math.sin(frame*.11)*1.2;
+
+  if(!pacmanEating){
+    var mdx=pacmanTargetX-pacmanStartX,mdy=pacmanTargetY-pacmanStartY;
+    var md=Math.hypot(mdx,mdy)||1;
+    var progress=Math.min(1,(frame-pacmanMoveStartFrame)*pacmanMoveSpeed/md);
+    x=pacmanStartX+mdx*progress;
+    y=pacmanStartY+mdy*progress;
+    dx=pacmanTargetX-x;dy=pacmanTargetY-y;
+    len=Math.hypot(dx,dy)||1; fx=dx/len;fy=dy/len;sx=-fy;sy=fx;
+  }else{
+    var eatProgress=Math.min(1,Math.max(0,(180-pacmanEatTimer)/180));
+    var cx=pacmanStartX,cy=pacmanStartY;
+    x=cx+(pacmanTargetX-cx)*eatProgress;
+    y=cy+(pacmanTargetY-cy)*eatProgress;
+    fx=Math.cos(pacmanRotation);fy=Math.sin(pacmanRotation);sx=-fy;sy=fx;
+  }
+
+  ctx.save();
+  ctx.translate(x,y+bob);
+  ctx.shadowBlur=fxShadow(pacmanEating?34:24);
+  ctx.shadowColor='#ffe34d';
+  ctx.fillStyle='#ffd92f';
+
+  if(!pacmanEating){
+    // Closed mouth: a complete circle. No rotation can make the character appear upside-down.
+    ctx.beginPath();ctx.arc(0,0,pacR,0,Math.PI*2);ctx.fill();
+  }else{
+    // Open mouth points exactly along the actual approach direction.
+    var bitePhase=(frame%22)/22;
+    // Mouth animation exists only after physical contact.
+    var mouthHalf=0.10+Math.abs(Math.sin(bitePhase*Math.PI*2))*0.46;
+    var a=Math.atan2(fy,fx);
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.arc(0,0,pacR,a+mouthHalf,a+Math.PI*2-mouthHalf,false);
+    ctx.closePath();ctx.fill();
+
+    // Food particles move in the same forward direction.
+    ctx.fillStyle='#ffe34d';
+    for(var d=0;d<3;d++){
+      var pd=18+d*18+((frame*1.7+d*17)%28);
+      var px=fx*pd + sx*Math.sin(frame*.18+d)*8;
+      var py=fy*pd + sy*Math.sin(frame*.18+d)*8;
+      ctx.beginPath();ctx.arc(px,py,3.2,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // The eye stays at the top of the Pac-Man body in screen coordinates.
+  // Only the mouth points toward the boss; the whole character is never rotated.
+  // This prevents the eyes from appearing upside-down for any approach direction.
+  var eyeX=-22;
+  var eyeY=-34;
+  ctx.fillStyle='#111';
+  ctx.beginPath();ctx.arc(eyeX,eyeY,9,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+function damageBossFromPlayerShot(b){
+  var dmg=Number(b&&b.power);
+  if(!Number.isFinite(dmg)||dmg<=0)dmg=1;
+  var mult=1;
+  if(typeof berserk==="number"&&berserk>0&&lives<=3)mult*=2;
+  if(rareEffect.airGun>0)mult*=1.2;
+  if(rareEffect.godBurst>0)mult*=25;
+  var total=dmg*mult;
+  if(explosionPower>0) total += explosionPower;
+  if(chainShot>0 && Math.random()<Math.min(.65,0.06*chainShot)){
+    total += 3 + chainShot*1.5;
+    spark(boss.x,boss.y,"#7df9ff",8);
+  }
+  // Вампиризм: обычные попадания лечат 1 сердце только на каждом 5-м попадании.
+  // Сверхлуч (type 5) считается непрерывным контактом: 1 сердце за каждые 5 секунд.
+  if(lifeSteal>0){
+    if(b && b.type===5){
+      lifeStealBeamFrames++;
+      if(lifeStealBeamFrames>=300){
+        if(lives<maxLives) lives++;
+        lifeStealBeamFrames=0;
+      }
+    }else{
+      lifeStealHits++;
+      if(lifeStealHits>=5){
+        if(lives<maxLives) lives++;
+        lifeStealHits=0;
+      }
+    }
+  }
+  if(window.__coop&&window.__coop.on&&!window.__coop.host){
+    if(window.__mpSendHit)window.__mpSendHit(total);
+    return total;
+  }
+  boss.hp=Math.max(0,boss.hp-total);
+  return total;
+}
+
+function unlockWeaponsByScore(){
+  // Оружие открывается именно по достижению порогов очков.
+  // Если за один раз получено несколько порогов, открываем несколько типов подряд.
+  var unlocked=false;
+  while(score>=upgradeScore && weapon<9){
+    weapon++;
+    upgradeScore+=75;
+    unlocked=true;
+  }
+  return unlocked;
+}
+
+function handleBossDefeat(fromPacman){
+  // Смерть от Пакмана проходит через тот же обработчик, что и обычная смерть босса.
+  // Босс сначала остаётся мёртвым на экране, затем появляется следующий экземпляр.
+  if(pacmanActive && !fromPacman)return false;
+  if(bossDeathTimer>0)return false;
+  if(boss.hp>0)return false;
+  // Сохраняем полный снимок именно в момент смерти.
+  var death={
+    x:boss.x,y:boss.y,vx:boss.vx,vy:boss.vy,
+    angle:(boss.ai&&Number.isFinite(boss.ai.angle))?boss.ai.angle:0,
+    targetX:(boss.ai&&Number.isFinite(boss.ai.targetX))?boss.ai.targetX:boss.x,
+    targetY:(boss.ai&&Number.isFinite(boss.ai.targetY))?boss.ai.targetY:boss.y,
+    sector:(boss.ai&&Number.isFinite(boss.ai.sector))?boss.ai.sector:0
+  };
+  score+=Math.round(30*scoreMult);
+  // Проверяем разблокировку оружия здесь, потому что после смерти босса игра
+  // может сразу поставить игру на паузу меню способностей.
+  var weaponUnlocked=unlockWeaponsByScore();
+  var shouldOpenUpgrade=pacmanUpgradePending || weaponUnlocked || score>=upgradeScore;
+  if(pacmanUpgradePending)pacmanUpgradePending=false;
+  if(pacmanJustKilledBoss && !shouldOpenUpgrade)pacmanUpgradePending=true;
+  pacmanJustKilledBoss=false;
+  var nuclearCarry=Math.max(0,rareEffect.nuclear|0);
+  boss.max=Math.min(3000,Math.round(boss.max*1.18+20));
+  boss.hp=boss.max;
+  bossAlpha=1;
+  bossDeathTimer=45;
+  bossDeathFlash=22;
+  rareEffect={godBurst:0,checkushka:0,airGun:0,freezer:0,poison:0,nuclear:nuclearCarry,fungal:0,timeShot:0};
+  nuclearMutation.type=0;nuclearMutation.timer=0;nuclearMutation.changeTimer=0;nuclearMutation.label="ОДИНОЧНЫЙ ОГОНЬ";
+  if(nuclearCarry>0)setNuclearMutation();
+  boss.x=death.x; boss.y=death.y; boss.vx=death.vx; boss.vy=death.vy;
+  if(!boss.ai)boss.ai={};
+  boss.ai.angle=death.angle; boss.ai.targetX=death.targetX; boss.ai.targetY=death.targetY; boss.ai.sector=death.sector;
+  boss.ai.nextDecision=45+Math.random()*55;
+  spark(boss.x,boss.y,'#ff45d9',35);
+  if(window.gameAudio&&window.gameAudio.bossDeath)window.gameAudio.bossDeath();
+  if(shouldOpenUpgrade){
+    showUpgradeMenu();
+  }
+  return true;
+}
+
+function update(){
+  // Полная пауза: НИ один игровой таймер/снаряд/ИИ не должен тикать в UI-меню.
+  if(ended||upgradePaused||window.__hardUIPause)return;
+
+  if(bigShipTimer>0){bigShipTimer--; if(bigShipTimer<=0)bigShipCount=0;}
+  if(bigShipCooldown>0){ bigShipCooldown--; if(bigShipCooldown<=0){ supportCharges++; updateUI(true); } }
+  if(pacmanCooldown>0){ pacmanCooldown--; if(pacmanCooldown<=0 && pacmanUnlocked){ pacmanCharges++; updateUI(true); } }
+  if(bossDeathTimer>0){ bossDeathTimer--; if(bossDeathFlash>0)bossDeathFlash--; }
+  if(pacmanActive){
+    var pacR=72.5,bossR=125,pacX=pacmanStartX,pacY=pacmanStartY;
+    if(pacmanDeathSnapshot){ boss.x=pacmanDeathSnapshot.x; boss.y=pacmanDeathSnapshot.y; boss.vx=0; boss.vy=0; }
+    if(!pacmanEating){
+      var dxp=pacmanTargetX-pacmanStartX,dyp=pacmanTargetY-pacmanStartY;
+      var distp=Math.hypot(dxp,dyp)||1;
+      var elapsed=Math.max(0,frame-pacmanMoveStartFrame);
+      var traveled=Math.min(distp,elapsed*pacmanMoveSpeed);
+      pacX=pacmanStartX+dxp*(traveled/distp);
+      pacY=pacmanStartY+dyp*(traveled/distp);
+      pacmanRotation=Math.atan2(pacmanTargetY-pacY,pacmanTargetX-pacX);
+      var remain=Math.hypot(pacmanTargetX-pacX,pacmanTargetY-pacY);
+      if(remain<=pacR+bossR){
+        // Physical contact: do not teleport. Keep the exact position reached by constant-speed motion.
+        pacmanStartX=pacX; pacmanStartY=pacY;
+        pacmanEating=true;
+        pacmanEatTimer=180;
+        // Lock the eating direction to the actual approach vector.
+        pacmanRotation=Math.atan2(dyp,dxp);
+        bossAlpha=1;
+      }
+    }else{
+      var eatProgress=Math.min(1,Math.max(0,(180-pacmanEatTimer)/180));
+      // Continue from the exact contact position into the boss centre; no snap/teleport.
+      var contactX=pacmanStartX,contactY=pacmanStartY;
+      pacX=contactX+(pacmanTargetX-contactX)*eatProgress;
+      pacY=contactY+(pacmanTargetY-contactY)*eatProgress;
+      // Босс исчезает только сам: экран и фон не затемняются.
+      bossAlpha=Math.max(0,1-eatProgress);
+      pacmanEatTimer--;
+      if(pacmanEatTimer<=0){
+        var pacmanDamage=(window.__coop&&window.__coop.on)?Math.min(50000,Math.max(0,Number(boss.hp)||0)):Math.max(0,Number(boss.hp)||0);
+        boss.hp=Math.max(0,boss.hp-pacmanDamage);
+        bossAlpha=1;
+        pacmanActive=false;
+        pacmanEating=false;
+        pacmanDeathSnapshot=null;
+        if(boss.hp<=0){
+          // Пакман завершает способность как полноценное убийство босса.
+          // Сначала отключаем анимацию, затем передаём смерть в единый обработчик.
+          pacmanJustKilledBoss=true;
+          handleBossDefeat(true);
+        }
+      }
+    }
+    for(var pb=enemyBullets.length-1;pb>=0;pb--){
+      var pe=enemyBullets[pb],pa=Math.atan2(pacY-pe.y,pacX-pe.x);
+      pe.x+=Math.cos(pa)*6;pe.y+=Math.sin(pa)*6;
+      if(Math.hypot(pe.x-pacX,pe.y-pacY)<pacR*.78){spark(pe.x,pe.y,'#ffe34d',4);enemyBullets.splice(pb,1);}
+    }
+  }
+  if(bigShipTimer>0 && frame%8===0){ for(var bs=0;bs<Math.max(1,bigShipCount);bs++){ var bx=W*.5+Math.sin(frame*.025+bs*1.8)*W*.3; bullets.push({x:bx,y:120+bs*18,vx:0,vy:7,power:16*damageMult,type:9,r:10,drone:true,source:"bigShip"}); } }
+
+  frame++;
+
+  if(shotTimer>0)shotTimer--;
+  if(dashCooldown>0)dashCooldown--;
+  if(cooldownFrames>0)cooldownFrames--;
+  if(regenLevel&&frame%600===0&&lives<maxLives)lives=Math.min(maxLives,lives+regenLevel);
+
+  if(shield){
+    shieldFrames--;
+    if(shieldFrames<=0)shield=false;
+  }else if(cooldownFrames<=0){
+    shieldReady=true;
+  }
+
+  if(dashTimer>0){
+    player.vx=dashDir*20;
+    player.x+=dashDir*20;
+    if(frame%2===0)spark(player.x-dashDir*18,player.y,"#6fe7ff",5);
+    dashTimer--;
+    if(dashTimer<=0)player.vx=0;
+  }else{
+    var direction=(moveLeft?-1:0)+(moveRight?1:0);
+    player.vx += direction*(1.4+speedBoost*.5);
+    player.vx *= .86;
+    player.x += player.vx;
+  }
+  if(player.x<40){player.x=40;player.vx=0;}
+  if(player.x>W-40){player.x=W-40;player.vx=0;}
+
+  // На гостевом клиенте босс НЕ симулируется локально: принимаем полный
+  // поток координат/скоростей от хоста и плавно интерполируем его.
+  var isGuestSync=!!(window.__coop&&window.__coop.on&&!window.__coop.host);
+  if(!isGuestSync && !pacmanActive && bossDeathTimer<=0){
+  // ИИ БОССА — широкий патруль по всей верхней карте.
+  if(rareEffect.poison>0 && frame%60===0) boss.hp=Math.max(0,boss.hp-poisonDamage);
+  if(rareEffect.checkushka>0 && frame%1===0) boss.hp=Math.max(0,boss.hp-(boss.max*0.15/checkushkaDuration));
+  if(boss.hp<=0)handleBossDefeat();
+  rareEffect.poison=Math.max(0,rareEffect.poison-1);
+  rareEffect.checkushka=Math.max(0,rareEffect.checkushka-1);
+  rareEffect.airGun=Math.max(0,rareEffect.airGun-1);
+  rareEffect.godBurst=Math.max(0,rareEffect.godBurst-1);
+  rareEffect.freezer=Math.max(0,rareEffect.freezer-1);
+  rareEffect.nuclear=Math.max(0,rareEffect.nuclear-1);
+  updateNuclearMutation();
+  rareEffect.fungal=Math.max(0,rareEffect.fungal-1);
+  // ИИ БОССА — широкий патруль по всей верхней карте.
+// Важно: центр больше НЕ является целью. Точки выбираются по секторам,
+// включая левый и правый края, а переход между ними плавный.
+  if(!pacmanActive && bossDeathTimer<=0){
+  if(!boss.ai){
+    boss.ai={
+      angle:Math.random()*Math.PI*2,
+      speed:2.05,
+      turnSpeed:.022,
+      nextDecision:45+Math.random()*55,
+      sector:Math.random()<.5?0:1,
+      targetX:0,
+      targetY:80
+    };
+  }
+
+  var top=55;
+  var bottom=Math.min(270,H*.46);
+  var edge=70;
+
+  boss.ai.nextDecision--;
+
+  // Чередуем удалённые сектора: левый -> правый -> левый...
+  // Поэтому босс не может долго оставаться в центральной зоне.
+  if(boss.ai.nextDecision<=0){
+    boss.ai.sector=(boss.ai.sector+1)%2;
+
+    var minX,maxX;
+    if(boss.ai.sector===0){
+      minX=edge;
+      maxX=Math.max(edge+1,W*.32);
+    }else{
+      minX=Math.min(W*.68,W-edge-1);
+      maxX=W-edge;
+    }
+
+    boss.ai.targetX=minX+Math.random()*Math.max(1,maxX-minX);
+    boss.ai.targetY=top+Math.random()*Math.max(1,bottom-top);
+    boss.ai.nextDecision=65+Math.random()*85;
+
+    var desired=Math.atan2(
+      boss.ai.targetY-boss.y,
+      boss.ai.targetX-boss.x
+    );
+    var d=Math.atan2(
+      Math.sin(desired-boss.ai.angle),
+      Math.cos(desired-boss.ai.angle)
+    );
+    // Новый курс задаётся плавно.
+    boss.ai.angle+=Math.max(-.55,Math.min(.55,d));
+  }
+
+  // Предиктивный уход от стен.
+  var look=95;
+  var fx=boss.x+boss.vx*look;
+  var fy=boss.y+boss.vy*look;
+  var avoidX=0,avoidY=0;
+
+  if(fx<edge) avoidX=1;
+  else if(fx>W-edge) avoidX=-1;
+  if(fy<top+25) avoidY=1;
+  else if(fy>bottom-25) avoidY=-1;
+
+  if(avoidX||avoidY){
+    var safeAngle=Math.atan2(
+      (bottom+top)*.5-boss.y+avoidY*180,
+      W*.5-boss.x+avoidX*220
+    );
+    var ad=Math.atan2(
+      Math.sin(safeAngle-boss.ai.angle),
+      Math.cos(safeAngle-boss.ai.angle)
+    );
+    boss.ai.angle+=Math.max(-.07,Math.min(.07,ad));
+  }else{
+    var targetAngle=Math.atan2(
+      boss.ai.targetY-boss.y,
+      boss.ai.targetX-boss.x
+    );
+    var td=Math.atan2(
+      Math.sin(targetAngle-boss.ai.angle),
+      Math.cos(targetAngle-boss.ai.angle)
+    );
+    boss.ai.angle+=Math.max(-boss.ai.turnSpeed,Math.min(boss.ai.turnSpeed,td));
+  }
+
+  var slowFactor=Math.max(.35,1-Math.min(.65,bossSlow*.5));
+  var wantedX=Math.cos(boss.ai.angle)*boss.ai.speed*slowFactor;
+  var wantedY=Math.sin(boss.ai.angle)*boss.ai.speed*.48*slowFactor;
+
+  boss.vx+=(wantedX-boss.vx)*.045;
+  boss.vy+=(wantedY-boss.vy)*.045;
+
+  boss.x+=boss.vx;
+  boss.y+=boss.vy;
+
+  // Только аварийная страховка; обычный разворот происходит заранее.
+  if(boss.x<42){
+    boss.x=42;
+    boss.vx=Math.abs(boss.vx);
+    boss.ai.sector=1;
+    boss.ai.nextDecision=1;
+  }else if(boss.x>W-42){
+    boss.x=W-42;
+    boss.vx=-Math.abs(boss.vx);
+    boss.ai.sector=0;
+    boss.ai.nextDecision=1;
+  }
+
+  if(boss.y<42){
+    boss.y=42;
+    boss.vy=Math.abs(boss.vy);
+  }else if(boss.y>bottom){
+    boss.y=bottom;
+    boss.vy=-Math.abs(boss.vy);
+  }
+  } // end host/local boss simulation
+
+  if(isGuestSync && !pacmanActive){
+    // Буфер состояний босса: рисуем небольшим временем позади сети и
+    // интерполируем между двумя соседними пакетами. Это убирает рывки
+    // даже при пропуске/неравномерном приходе сетевых пакетов.
+    var nowNet=performance.now();
+    var renderT=nowNet-REMOTE_INTERP_MS;
+    var buf=remoteBossBuffer;
+    while(buf.length>2 && buf[1].t<=renderT) buf.shift();
+    var a=buf[0], b=buf[1], tx,ty,tvx,tvy,thp,tmax;
+    if(a&&b&&b.t>a.t){
+      var q=Math.max(0,Math.min(1,(renderT-a.t)/(b.t-a.t)));
+      tx=a.x+(b.x-a.x)*q; ty=a.y+(b.y-a.y)*q;
+      tvx=a.vx+(b.vx-a.vx)*q; tvy=a.vy+(b.vy-a.vy)*q;
+      thp=a.hp+(b.hp-a.hp)*q; tmax=a.max+(b.max-a.max)*q;
+    }else if(a){
+      var ex=Math.min(140,Math.max(0,renderT-a.t))/1000;
+      tx=a.x+a.vx*ex; ty=a.y+a.vy*ex; tvx=a.vx; tvy=a.vy; thp=a.hp; tmax=a.max;
+    }else{
+      tx=remoteBossState.x; ty=remoteBossState.y; tvx=remoteBossState.vx; tvy=remoteBossState.vy; thp=remoteBossState.hp;
+    }
+    boss.x += (tx-boss.x)*0.30;
+    boss.y += (ty-boss.y)*0.30;
+    boss.vx += (tvx-boss.vx)*0.24;
+    boss.vy += (tvy-boss.vy)*0.24;
+    if(Number.isFinite(tmax))boss.max=Math.min(3000,Math.max(boss.max,tmax));
+    boss.hp += (thp-boss.hp)*0.30;
+    boss.hp=Math.max(0,Math.min(boss.max,boss.hp));
+  }
+
+  // Мини-корабли: бессмертные спутники, наносят небольшой урон.
+  for(var d=0;d<drones.length;d++){
+    var dr=drones[d];
+    dr.angle += 0.025 + d*.001;
+    dr.x=player.x+Math.cos(dr.angle)*dr.dist;
+    dr.y=player.y+Math.sin(dr.angle)*dr.dist + Math.sin(frame*.08+dr.phase)*7;
+    dr.shot=(dr.shot||0)-1;
+    if(dr.shot<=0){
+      var da=Math.atan2(boss.y-dr.y,boss.x-dr.x);
+      bullets.push({x:dr.x,y:dr.y,vx:Math.cos(da)*3,vy:Math.sin(da)*3,power:droneDamage*damageMult,drone:true});
+      dr.shot=droneRate;
+    }
+  }
+
+  // Автоогонь: если босс находится примерно в линии прицела.
+  var aimed=Math.abs(boss.x-player.x)<aimRange && boss.y<player.y;
+  if(manualFire||aimed)shoot();
+  if(volleyLevel>0 && (manualFire||aimed) && shotTimer===Math.max(0,Math.round(16*fireRateMult)-1)){
+    bullets.push({x:player.x+10,y:player.y-28,vx:0,vy:-12,power:2*damageMult,type:0});
+  }
+
+  }
+
+  bossTimer--;
+  if(bossTimer<=0 && !rareEffect.freezer){
+    if(rareEffect.nuclear>0){
+      spawnNuclearShot(nuclearMutation.type);
+      if(window.gameAudio&&window.gameAudio.bossShot)window.gameAudio.bossShot();
+      bossTimer=52;
+    }else{
+      var n=weapon>=2?5:3;
+      if(rareEffect.fungal>0 && Math.random()<.55){ bossTimer=35; } else {
+        for(var j=0;j<n;j++){
+          var a=Math.atan2(player.y-boss.y,player.x-boss.x)+(j-(n-1)/2)*.13;
+          enemyBullets.push({x:boss.x,y:boss.y+30,vx:Math.cos(a)*2.4,vy:Math.sin(a)*2.4,kind:"normal"});
+          if(window.gameAudio&&window.gameAudio.bossShot)window.gameAudio.bossShot();
+        }
+        bossTimer=90;
+      }
+    }
+  }
+
+  if(bullets.length>70)bullets.splice(0,bullets.length-70);
+  if(enemyBullets.length>42)enemyBullets.splice(0,enemyBullets.length-42);
+  for(var i=bullets.length-1;i>=0;i--){
+    var b=bullets[i];
+    if(b.homing){
+      var ha=Math.atan2(boss.y-b.y,boss.x-b.x);
+      b.vx+=(Math.cos(ha)*.18); b.vy+=(Math.sin(ha)*.18);
+      var hm=Math.hypot(b.vx,b.vy)||1; if(hm>8){b.vx*=8/hm;b.vy*=8/hm;}
+    }
+    var shotSpeedFactor=rareEffect.timeShot>0?1.10:1;
+    b.x+=b.vx*shotSpeedFactor;b.y+=b.vy*shotSpeedFactor;
+    if(b.type===4){b.rot=(b.rot||0)+.18;b.life--;if(b.life<=0){bullets.splice(i,1);continue;}}
+    if(b.type===8){b.r=Math.min(42,(b.r||1)+.55);b.rot=(b.rot||0)+.12;b.life--;if(b.life<=0){bullets.splice(i,1);continue;}}
+    if(b.type===5){
+      b.x=player.x;
+      b.y=player.y-20;
+      b.life--;
+      b.fxTick=Math.max(0,(b.fxTick||0)-1);
+      if(b.life<=0){bullets.splice(i,1);continue;}
+    }
+
+    var hitX=(b.x-boss.x)/62;
+    var hitY=(b.y-boss.y)/35;
+    var bossHit=(hitX*hitX+hitY*hitY)<=1;
+    if(b.type===4||b.type===6||b.type===8||b.type===9){
+      bossHit=Math.hypot(b.x-boss.x,b.y-boss.y)<((b.type===4)?22:(b.r||20))+42;
+    }
+    if(b.type===5){
+      bossHit=(Math.abs(b.x-boss.x)<24 && boss.y<b.y && boss.y>b.y-520);
+    }
+    if(pacmanActive)bossHit=false;
+    if(bossHit){
+      if(b.type!==5)bullets.splice(i,1);
+      damageBossFromPlayerShot(b);
+      if(window.gameAudio&&window.gameAudio.bossHit)window.gameAudio.bossHit();
+      if(b.type===5){
+        b.fxTick=10;
+      }else{
+        spark(b.x,b.y,b.power>3?"#46efff":"#ffd33d",4);
+        specialBurst(b.x,b.y,b.power>3?"#46efff":"#ffd33d",42);
+      }
+
+      if(boss.hp<=0)handleBossDefeat();
+
+
+    }else{
+      // Сверхлуч должен попадать непрерывно: если контакт прервался, таймер вампиризма сбрасывается.
+      if(b.type===5 && lifeSteal>0)lifeStealBeamFrames=0;
+      if(b.y<-70||b.x<-80||b.x>W+80){
+        bullets.splice(i,1);
+      }
+    }
+  }
+
+  // Орбитальный огонь: энергетический шар периодически наносит боссу урон.
+  if(orbitalDamage>0){
+    orbitalTimer--;
+    if(orbitalTimer<=0){
+      var orbitalDmg=5*orbitalDamage*damageMult;
+      damageBossFromPlayerShot({power:orbitalDmg});
+      if(boss.hp<=0)handleBossDefeat();
+      spark(boss.x,boss.y,"#b86cff",10);specialBurst(boss.x,boss.y,"#b86cff",58);
+      orbitalTimer=48;
+    }
+  }
+
+  // Космический барьер: уничтожает часть ближайших вражеских снарядов.
+  if(explosiveShield>0 && enemyBullets.length){
+    for(var si=enemyBullets.length-1;si>=0;si--){
+      var seb=enemyBullets[si];
+      if(Math.hypot(seb.x-player.x,seb.y-player.y)<105 && Math.random()<Math.min(.55,.025*explosiveShield)){
+        spark(seb.x,seb.y,"#6fe7ff",4);
+        enemyBullets.splice(si,1);
+      }
+    }
+  }
+
+  if(!pacmanActive){
+    for(var q=enemyBullets.length-1;q>=0;q--){
+      var eb=enemyBullets[q];
+      eb.age=(eb.age||0)+1;
+      if(eb.kind==="nuclearHeal" && eb.age>52 && eb.phase===0){
+        eb.phase=1;
+      }else if(eb.kind==="nuclearRocket" && eb.age>58 && eb.phase===0){
+        eb.phase=1;
+      }
+      if(eb.phase===1 && (eb.kind==="nuclearHeal"||eb.kind==="nuclearRocket")){
+        var ta=Math.atan2(boss.y-eb.y,boss.x-eb.x);
+        var ca=Math.atan2(eb.vy,eb.vx);
+        var turn=eb.kind==="nuclearRocket"?.18:.12;
+        var delta=Math.atan2(Math.sin(ta-ca),Math.cos(ta-ca));
+        var na=ca+Math.max(-turn,Math.min(turn,delta));
+        var sp=eb.kind==="nuclearRocket"?5.2:4.1;
+        eb.vx=Math.cos(na)*sp; eb.vy=Math.sin(na)*sp;
+      }
+      eb.x+=eb.vx;eb.y+=eb.vy;
+      if(eb.phase===1 && (eb.kind==="nuclearHeal"||eb.kind==="nuclearRocket") && Math.hypot(eb.x-boss.x,eb.y-boss.y)<58){
+        if(eb.kind==="nuclearHeal"){
+          boss.hp=Math.min(boss.max,boss.hp+(eb.heal||40));
+          spark(boss.x,boss.y,"#62ff86",14);specialBurst(boss.x,boss.y,"#62ff86",30);
+        }else{
+          boss.hp=Math.max(0,boss.hp-(eb.damage||60));
+          spark(boss.x,boss.y,"#ff6b4d",18);specialBurst(boss.x,boss.y,"#ff6b4d",36);
+          if(boss.hp<=0)handleBossDefeat();
+        }
+        enemyBullets.splice(q,1);continue;
+      }
+      if(((eb.x-player.x)*(eb.x-player.x)+(eb.y-player.y)*(eb.y-player.y))<784){
+        if(eb.kind==="nuclearHeal"){
+          var healed=Math.max(1,Math.min(3,maxLives-lives));
+          if(healed>0){
+            lives+=healed;
+            spark(player.x,player.y,"#62ff86",18);
+            specialBurst(player.x,player.y,"#62ff86",42);
+            if(window.gameAudio&&window.gameAudio.heal)window.gameAudio.heal();
+          }else{
+            spark(player.x,player.y,"#b8ffd0",8);
+          }
+        }else{
+          playerDamage();
+        }
+        enemyBullets.splice(q,1);
+      }else if(eb.age>(eb.life||240)||eb.y>H+60||eb.x<-80||eb.x>W+80){
+        enemyBullets.splice(q,1);
+      }
+    }
+  }
+
+  if(score>=upgradeScore && !upgradePaused){
+    var unlockedNow=unlockWeaponsByScore();
+    if(unlockedNow){
+      spark(player.x,player.y,"#aaff55",30);
+      showUpgradeMenu();
+    }
+  }
+
+  for(var z=sparks.length-1;z>=0;z--){
+    var p=sparks[z];
+    p.x+=p.vx;p.y+=p.vy;p.vx*=.98;p.vy*=.98;p.life-=.04;
+    if(p.life<=0)sparks.splice(z,1);
+  }
+}
+
+
+// Лёгкий адаптивный контроль качества: если устройство стабильно проседает,
+// уменьшаем только вторичные эффекты, не меняя физику/игровую логику.
+var fpsProbe={last:performance.now(),frames:0,lowMs:0};
+function probeFPS(t){
+  fpsProbe.frames++;
+  if(t-fpsProbe.last>=1500){
+    var fps=fpsProbe.frames*1000/(t-fpsProbe.last);
+    if(fps<42){mobileFX=true;starCount=Math.min(starCount,56);sparkLimit=Math.min(sparkLimit,55);}
+    else if(fps>55 && !lowPowerMode){mobileFX=false;starCount=120;sparkLimit=130;}
+    fpsProbe.last=t;fpsProbe.frames=0;
+  }
+}
+
+function draw(t){
+  probeFPS(t||performance.now());
+  trimEffects();
+  bossAlpha=(pacmanActive && pacmanEating)?Math.max(0,Math.min(1,pacmanEatTimer/180)):1;
+
+  // Full-screen canvas: background fills the whole device, while the game world
+  // is rendered in a centered 16:9 viewport without stretching or cropping.
+  var vw=Math.max(1,window.innerWidth), vh=Math.max(1,window.innerHeight);
+  ctx.setTransform(scale,0,0,scale,0,0);
+  ctx.clearRect(0,0,vw,vh);
+  var bgScale=Math.max(vw/W,vh/H);
+  var bgW=W*bgScale,bgH=H*bgScale;
+  ctx.drawImage(sceneCache,(vw-bgW)*.5,(vh-bgH)*.5,bgW,bgH);
+
+  ctx.save();
+  ctx.translate(viewLeft,viewTop);
+  ctx.scale(viewScale,viewScale);
+
+  // Animated stars remain dynamic.
+  ctx.globalAlpha=1;
+  for(var s=0;s<stars.length;s++){
+    var st=stars[s];
+    if(!upgradePaused&&!window.__hardUIPause)st.y+=st.s*.0015;
+    if(st.y>1)st.y=0;
+    var tw=.35+.35*Math.sin(frame*.04+s);
+    ctx.globalAlpha=tw;ctx.fillStyle="#e6efff";
+    ctx.beginPath();ctx.arc(st.x*W,st.y*H,st.r,0,Math.PI*2);ctx.fill();
+    if(st.r>1.5){
+      ctx.globalAlpha=tw*.25;
+      ctx.fillRect(st.x*W-5,st.y*H,10,1);
+      ctx.fillRect(st.x*W,st.y*H-5,1,10);
+    }
+  }
+  ctx.globalAlpha=1;
+
+  update();
+
+  // Bullets
+  for(var i=0;i<bullets.length;i++){
+    var b=bullets[i];
+    ctx.save();
+    var col=b.drone?"#aaff66":weaponColors[b.type]||"#fff";
+    ctx.shadowBlur=(b.type>=4?28:16);
+    ctx.shadowColor=col;
+    ctx.fillStyle=col;
+    if(b.type===4){
+      // Кристальный осколок: вытянутый вращающийся энергетический кристалл, не шар.
+      ctx.save();ctx.translate(b.x,b.y);ctx.rotate(b.rot||0);
+      ctx.beginPath();ctx.moveTo(0,-22);ctx.lineTo(7,-7);ctx.lineTo(4,18);ctx.lineTo(0,25);ctx.lineTo(-4,18);ctx.lineTo(-7,-7);ctx.closePath();ctx.fill();
+      ctx.globalAlpha=.55;ctx.fillStyle="#ffffff";ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(3,-5);ctx.lineTo(0,14);ctx.lineTo(-2,-5);ctx.closePath();ctx.fill();
+      ctx.restore();
+    }else if(b.type===6||b.type===7||b.type===9){
+      if(b.type===6){
+        ctx.beginPath();ctx.moveTo(b.x,b.y-26);ctx.lineTo(b.x+8,b.y-6);ctx.lineTo(b.x+24,b.y);ctx.lineTo(b.x+8,b.y+6);ctx.lineTo(b.x,b.y+26);ctx.lineTo(b.x-8,b.y+6);ctx.lineTo(b.x-24,b.y);ctx.lineTo(b.x-8,b.y-6);ctx.closePath();ctx.fill();
+      }else if(b.type===7){
+        ctx.save();ctx.translate(b.x,b.y);ctx.rotate(Math.atan2(b.vy,b.vx));ctx.fillRect(-5,-18,10,36);ctx.strokeStyle=col;ctx.lineWidth=2;ctx.strokeRect(-9,-22,18,44);ctx.restore();
+      }else{
+        ctx.beginPath();ctx.moveTo(b.x,b.y-28);ctx.lineTo(b.x+16,b.y+16);ctx.lineTo(b.x,b.y+8);ctx.lineTo(b.x-16,b.y+16);ctx.closePath();ctx.fill();
+      }
+    }else if(b.type===8){
+      // Гравитационный разрыв: кольцо с четырьмя искривлёнными лучами.
+      var rr=b.r||8,rot=b.rot||0;
+      ctx.save();ctx.translate(b.x,b.y);ctx.rotate(rot);
+      ctx.globalAlpha=.95;ctx.strokeStyle=col;ctx.lineWidth=3;
+      ctx.beginPath();ctx.arc(0,0,rr,0,Math.PI*2);ctx.stroke();
+      ctx.globalAlpha=.65;ctx.lineWidth=2;
+      for(var q=0;q<4;q++){ctx.rotate(Math.PI/2);ctx.beginPath();ctx.moveTo(rr+2,0);ctx.quadraticCurveTo(rr*2.2,rr*.65,rr*2.8,0);ctx.stroke();}
+      ctx.globalAlpha=.9;ctx.fillStyle="#101020";ctx.beginPath();ctx.arc(0,0,Math.max(2,rr*.32),0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    }else if(b.type===5){
+      // Сверхлуч: один постоянный эффект вместо потока частиц.
+      var beamGrad=ctx.createLinearGradient(b.x,0,b.x,player.y);
+      beamGrad.addColorStop(0,"#ff3bd4");
+      beamGrad.addColorStop(.5,"#fff");
+      beamGrad.addColorStop(1,"#ff3bd4");
+      var beamPulse=1+Math.sin(frame*.18)*.12;
+      ctx.fillStyle=beamGrad;
+      ctx.fillRect(b.x-9*beamPulse,0,18*beamPulse,b.y);
+      ctx.globalAlpha=.55;
+      ctx.fillStyle="#ffffff";
+      ctx.fillRect(b.x-2,b.y*.12,4,b.y*.76);
+      ctx.globalAlpha=.85;
+      ctx.strokeStyle="#ff72e8";
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(b.x-13,player.y);ctx.lineTo(b.x-13,b.y);
+      ctx.moveTo(b.x+13,player.y);ctx.lineTo(b.x+13,b.y);
+      ctx.stroke();
+      if(b.fxTick>0){
+        ctx.globalAlpha=b.fxTick/10;
+        ctx.strokeStyle="#ffffff";
+        ctx.lineWidth=3;
+        ctx.beginPath();ctx.arc(b.x,boss.y,18+(10-b.fxTick)*1.5,0,Math.PI*2);ctx.stroke();
+      }
+    }else{
+      ctx.fillRect(b.x-3,b.y-22,6,22);
+    }
+    ctx.restore();
+  }
+
+  // Enemy bullets + ядерные мутации
+  for(var j=0;j<enemyBullets.length;j++){
+    var eb=enemyBullets[j];
+    ctx.save();
+    if(eb.kind==="nuclearHeal"){
+      ctx.shadowBlur=fxShadow(22);ctx.shadowColor="#62ff86";ctx.fillStyle="#62ff86";
+      ctx.beginPath();ctx.arc(eb.x,eb.y,8,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle="#b8ffd0";ctx.lineWidth=3;ctx.beginPath();ctx.arc(eb.x,eb.y,14+Math.sin(frame*.18)*2,0,Math.PI*2);ctx.stroke();
+    }else if(eb.kind==="nuclearRocket"){
+      var rr=Math.atan2(eb.vy,eb.vx);ctx.translate(eb.x,eb.y);ctx.rotate(rr);
+      ctx.shadowBlur=fxShadow(24);ctx.shadowColor="#ff6b4d";ctx.fillStyle="#ff6b4d";
+      ctx.beginPath();ctx.moveTo(17,0);ctx.lineTo(-9,-7);ctx.lineTo(-5,0);ctx.lineTo(-9,7);ctx.closePath();ctx.fill();
+      ctx.fillStyle="#ffd2a8";ctx.fillRect(-8,-3,9,6);
+      ctx.fillStyle="#ff9d45";ctx.beginPath();ctx.moveTo(-8,0);ctx.lineTo(-22,-5);ctx.lineTo(-18,0);ctx.lineTo(-22,5);ctx.closePath();ctx.fill();
+    }else{
+      ctx.shadowBlur=fxShadow(18);ctx.shadowColor="#ff426e";ctx.fillStyle="#ff426e";
+      ctx.beginPath();ctx.arc(eb.x,eb.y,7,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=.35;ctx.beginPath();ctx.arc(eb.x,eb.y,13,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // Детализированный босс — рисуется после очистки canvas.
+  drawDetailedBossFinal();
+
+  // Ярко показываем подтверждение смерти босса, пока следующий ещё не появился.
+  if(bossDeathTimer>0 && bossDeathFlash>0){
+    var df=1-bossDeathFlash/22, dr=28+df*125;
+    ctx.save();
+    ctx.globalAlpha=(1-df)*.95;
+    ctx.strokeStyle="#ff4b91";ctx.shadowColor="#ff267a";ctx.shadowBlur=fxShadow(42);ctx.lineWidth=8;
+    ctx.beginPath();ctx.arc(boss.x,boss.y,dr,0,Math.PI*2);ctx.stroke();
+    ctx.globalAlpha=(1-df)*.7;ctx.fillStyle="#fff";
+    ctx.beginPath();ctx.arc(boss.x,boss.y,Math.max(8,dr*.18),0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+
+  // Pac-Man sequence: slowly approaches, covers the boss, eats it, then disappears before respawn.
+  if(pacmanActive)drawPacman();
+
+  // Aim indicator
+  if(bossDeathTimer<=0 && Math.abs(boss.x-player.x)<aimRange){
+    ctx.strokeStyle="#48f3ff";ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(boss.x,boss.y,57+Math.sin(frame*.15)*3,0,Math.PI*2);ctx.stroke();
+  }
+
+  // Мини-корабли
+  for(var di=0;di<drones.length;di++){
+    var dr=drones[di];
+    ctx.save();
+    ctx.translate(dr.x,dr.y);
+    ctx.rotate(dr.angle+Math.PI/2);
+    ctx.shadowBlur=fxShadow(18);ctx.shadowColor="#65ff9a";
+    ctx.fillStyle="#244f4a";
+    ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(-18,10);ctx.lineTo(-5,7);ctx.lineTo(0,13);ctx.lineTo(5,7);ctx.lineTo(18,10);ctx.closePath();ctx.fill();
+    ctx.fillStyle="#62e99b";
+    ctx.beginPath();ctx.moveTo(0,-12);ctx.lineTo(-11,8);ctx.lineTo(0,4);ctx.lineTo(11,8);ctx.closePath();ctx.fill();
+    ctx.shadowBlur=0;ctx.fillStyle="#eaffff";
+    ctx.beginPath();ctx.ellipse(0,-3,5,7,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#65ff9a";
+    ctx.beginPath();ctx.arc(0,13+Math.sin(frame*.25+dr.phase)*2,4,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle="#65ff9a55";ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(0,0,22+Math.sin(frame*.08+dr.phase)*2,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+  }
+
+  // Player
+  if(dashTimer>0){
+    ctx.save();
+    for(var dt=1;dt<=4;dt++){
+      ctx.globalAlpha=.22/dt;
+      ctx.fillStyle="#6fe7ff";
+      ctx.beginPath();
+      ctx.ellipse(player.x-dashDir*dt*14,player.y,30-dt*3,12-dt*1.5,0,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  ctx.save();
+  ctx.translate(player.x,player.y);
+  if(shield){
+    /* Normal shield is calm; only the final 1 second warns by blinking bright red. */
+    var shieldWarning = shieldFrames > 0 && shieldEndsAt>0 && (shieldEndsAt-performance.now())<=1000;
+    var shieldBlink = shieldWarning && (Math.floor(frame/6)%2===0);
+    var shieldColor = shieldWarning ? (shieldBlink ? "#ff102f" : "#ff5264") : "#42efff";
+    ctx.strokeStyle=shieldColor;
+    ctx.lineWidth=shieldWarning ? 7 : 4;
+    ctx.shadowBlur=fxShadow(shieldWarning ? 38 : 20);
+    ctx.shadowColor=shieldWarning ? "#ff102f" : "#42efff";
+    ctx.globalAlpha=shieldWarning ? (shieldBlink ? 1 : .3) : .72;
+    ctx.beginPath();ctx.arc(0,0,48+Math.sin(frame*.2)*3,0,Math.PI*2);ctx.stroke();
+    ctx.globalAlpha=1;
+  }
+  ctx.shadowBlur=fxShadow(28);ctx.shadowColor="#31dfff";
+  ctx.fillStyle="#173a61";
+  ctx.beginPath();ctx.moveTo(0,-36);ctx.lineTo(-43,28);ctx.lineTo(-12,20);ctx.lineTo(0,30);ctx.lineTo(12,20);ctx.lineTo(43,28);ctx.closePath();ctx.fill();
+  ctx.fillStyle="#43cfff";
+  ctx.beginPath();ctx.moveTo(0,-31);ctx.lineTo(-29,22);ctx.lineTo(0,12);ctx.lineTo(29,22);ctx.closePath();ctx.fill();
+  ctx.fillStyle="#bff8ff";
+  ctx.beginPath();ctx.ellipse(0,-8,13,18,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#153f62";
+  ctx.beginPath();ctx.ellipse(0,-8,8,12,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#66f4ff";
+  ctx.fillRect(-25,16,9,4);ctx.fillRect(16,16,9,4);
+  ctx.shadowBlur=20;ctx.shadowColor=weaponColors[weapon]||"#fff";
+  ctx.fillStyle=weaponColors[weapon]||"#fff";
+  ctx.beginPath();ctx.arc(0,31,7+Math.sin(frame*.3)*2,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+  if(window.__mpDrawRemote)window.__mpDrawRemote(ctx);
+
+  drawBigSupportShip();
+
+  // Restored special effects from the previous visual version, with hard caps for performance.
+  for(var ri=fxRings.length-1;ri>=0;ri--){
+    var ring=fxRings[ri];
+    ring.r += (ring.max-ring.r)*.16;
+    ring.life -= .055;
+    if(ring.life<=0){fxRings.splice(ri,1);continue;}
+    ctx.globalAlpha=ring.life*.72;
+    ctx.strokeStyle=ring.color;
+    ctx.shadowColor=ring.color;
+    ctx.shadowBlur=fxShadow(18);
+    ctx.lineWidth=mobileFX?2:3;
+    ctx.beginPath();ctx.arc(ring.x,ring.y,ring.r,0,Math.PI*2);ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  ctx.shadowBlur=0;
+
+  // Particles
+  for(var k=0;k<sparks.length;k++){
+    var sp=sparks[k];
+    ctx.globalAlpha=sp.life;
+    ctx.fillStyle=sp.color;
+    ctx.beginPath();ctx.arc(sp.x,sp.y,3,0,Math.PI*2);ctx.fill();
+  }
+  // Никогда не переносим прозрачность босса на частицы/следующий кадр.
+  ctx.globalAlpha=1;
+
+  if((uiFrameSkip++&5)===0)updateUI();
+  ctx.restore();
+  requestAnimationFrame(draw);
+}
+draw();
+})();
+</script>
+<div id="confirmUpgrade" class="confirmUpgrade"><div class="confirmBox"><div id="confirmIcon" class="confirmIcon">✨</div><div id="confirmName" class="confirmName">Выбор</div><div id="confirmDesc" class="confirmDesc">Подтвердить способность?</div><div class="confirmBtns"><button id="confirmNoBtn" class="confirmNo" type="button">ОТМЕНА</button><button id="confirmYesBtn" class="confirmYes" type="button">✓ ВЫБРАТЬ</button></div></div></div>
+<button id="mpBtn" type="button">👥 Мультиплеер</button>
+<button id="settingsBtn" type="button" aria-label="Настройки">⚙️</button>
+<div id="settingsPanel"><div id="settingsBox">
+  <h3>⚙️ Настройки</h3>
+  <div class="setRow"><button id="musicBtn" class="setBtn" type="button">🎵 Музыка: ВКЛ</button><button id="sfxBtn" class="setBtn" type="button">🔊 Звуки: ВКЛ</button></div>
+  <div style="margin-top:12px;font-weight:900;font-size:13px">🎵 Выбор музыки</div>
+  <div class="setHint" style="margin-top:6px">🎶 Можно поставить свою любую музыку: просто нажми «Загрузить файл» и выбери музыкальный файл на телефоне. Отдельно загружать его на сайт не нужно — игра будет использовать выбранный файл.</div>
+  <div class="setRow"><button id="builtInMusicBtn" class="setBtn" type="button">🎶 Встроенная музыка</button><button id="onlineMusicBtn" class="setBtn" type="button">🌐 Интернет</button></div>
+  <div class="setRow"><label for="musicFile" class="setBtn" style="display:flex;align-items:center;justify-content:center;cursor:pointer">📁 Загрузить файл</label><input id="musicFile" type="file" accept="audio/*,.mp3,.ogg,.wav,.m4a,.aac" style="display:none"></div>
+  <div id="musicFileName" class="setHint">Файл не выбран</div>
+  <div style="margin-top:8px;font-weight:900;font-size:13px">🔎 Найти песню по названию</div>
+  <div class="setRow"><input id="musicSearch" class="setInput" type="search" inputmode="search" placeholder="Например: Blinding Lights" style="margin:0"><button id="musicSearchBtn" class="setBtn" type="button">🔎 Найти</button></div>
+  <div id="musicSearchStatus" class="setHint">Поиск использует каталог Apple Music/iTunes и ставит доступное официальное превью. Полную песню из стримингового сервиса браузер автоматически не получает.</div>
+  <input id="musicUrl" class="setInput" type="url" inputmode="url" placeholder="https://site.com/music.mp3">
+  <div class="setRow"><button id="applyMusicBtn" class="setBtn" type="button">▶️ Применить</button><button id="settingsClose" class="setBtn" type="button">Готово</button></div>
+  <div class="setHint">Загруженный файл сохраняется на этом устройстве и восстанавливается после поражения и перезагрузки страницы. Для прямой интернет-ссылки нужен URL самого аудиофайла.</div>
+</div></div>
+<div id="coopInfo">👥 CO-OP • 2 ИГРОКА • ОБЩАЯ КАМЕРА</div><div id="reviveInfo"></div><div id="mpPanel">
+  <div id="mpBox">
+    <h3 style="margin:0 0 8px">👥 Мультиплеер</h3>
+    <div style="font-size:13px;opacity:.85">🌐 Интернет: два игрока могут подключиться к одной комнате с iPhone, Android или ПК.</div>
+    <input id="mpRoom" maxlength="20" placeholder="Код комнаты">
+    <button id="mpHost">Создать комнату</button>
+    <button id="mpJoin">Подключиться</button>
+    <button id="mpClose">Закрыть</button>
+    <div id="mpStatus"></div><div id="mpCrossDeviceNote" style="font-size:11px;opacity:.78;margin:7px 0 0">🌐 Работает между iPhone, Android и ПК через интернет. Оба игрока должны открыть эту HTML-версию онлайн.</div>
+  </div>
+</div>
+
+<script id="multiplayer-layer">
+(function(){
+  const panel=document.getElementById("mpPanel");
+  const status=document.getElementById("mpStatus");
+  const roomInput=document.getElementById("mpRoom");
+  const hostBtn=document.getElementById("mpHost");
+  const joinBtn=document.getElementById("mpJoin");
+  const closeBtn=document.getElementById("mpClose");
+  const mpBtn=document.getElementById("mpBtn");
+  let mpMenuOpen=false, connectBusy=false, connectTimer=null, reconnectBusy=false, peerLoading=false, peerLoadQueue=[];
+
+  function say(t){ if(status) status.textContent=t; }
+  function setPanel(open){
+    mpMenuOpen=!!open;
+    if(panel){
+      panel.style.display=open?"grid":"none";
+      panel.style.pointerEvents=open?"auto":"none";
+    }
+  }
+  function pauseForMP(){
+    window.__setUIPause("multiplayer",true);
+    setPanel(true);
+  }
+  function resumeFromMP(){
+    setPanel(false);
+    window.__clearUIPause("multiplayer");
+    if(window.syncUtilityButtons) window.syncUtilityButtons();
+  }
+  function open(){
+    pauseForMP();
+    if(window.gameAudio&&window.gameAudio.unlock) window.gameAudio.unlock();
+  }
+  function close(){ resumeFromMP(); }
+  function normalizeCode(v){return String(v||"").replace(/[^A-Za-z0-9]/g,"").toUpperCase().slice(0,20);}
+  function makeCode20(){
+    const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let x="";
+    for(let i=0;i<20;i++) x+=chars[(Math.random()*chars.length)|0];
+    return x;
+  }
+  function clearConnectTimer(){if(connectTimer){clearTimeout(connectTimer);connectTimer=null;}}
+  function destroyPeer(){
+    clearConnectTimer();
+    if(coop.reconnectTimer){clearTimeout(coop.reconnectTimer);coop.reconnectTimer=null;}
+    coop.generation++; coop.connecting=false;
+    try{if(coop.conn)coop.conn.close();}catch(e){}
+    try{if(coop.peer)coop.peer.destroy();}catch(e){}
+    coop.conn=null; coop.peer=null; coop.on=false; coop.remote=null; reconnectBusy=false;
+  }
+  function loadPeerJS(done){
+    function runDone(fn){
+      if(typeof fn!=="function")return;
+      try{
+        fn();
+      }catch(e){
+        connectBusy=false;
+        reconnectBusy=false;
+        say("❌ Ошибка запуска связи: "+(e&&e.message?e.message:"неизвестная ошибка"));
+        console.error("PeerJS callback error",e);
+      }
+    }
+    if(typeof done==="function")peerLoadQueue.push(done);
+    if(window.Peer){
+      const q=peerLoadQueue.splice(0);
+      q.forEach(runDone);
+      return;
+    }
+    if(peerLoading)return;
+    peerLoading=true;
+    say("⏳ Загружаем модуль связи…");
+    const sc=document.createElement("script");
+    sc.src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js";
+    sc.async=true;
+    sc.onload=function(){
+      peerLoading=false;
+      const q=peerLoadQueue.splice(0);
+      if(window.Peer){
+        q.forEach(runDone);
+      }else{
+        connectBusy=false;
+        reconnectBusy=false;
+        say("❌ Модуль связи не загрузился.");
+      }
+    };
+    sc.onerror=function(){
+      peerLoading=false;
+      peerLoadQueue.length=0;
+      connectBusy=false;
+      reconnectBusy=false;
+      say("❌ Не удалось загрузить связь. Проверь интернет.");
+    };
+    document.head.appendChild(sc);
+  }
+  const coop=window.coop=window.__coop={on:false,host:false,remote:null,peer:null,conn:null,dead:false,reviveFrames:0,camX:0,camY:0,roomCode:"",generation:0,reconnectTimer:null,lastRx:0,lastTx:0,connecting:false,reconnectAttempts:0,stateSeq:0,lastStateSeq:0};
+  const PEER_OPTIONS={
+    debug:0,
+    config:{
+      iceServers:[
+        {urls:"stun:stun.l.google.com:19302"},
+        {urls:"stun:stun1.l.google.com:19302"},
+        {urls:"stun:stun.cloudflare.com:3478"}
+      ],
+      iceCandidatePoolSize:8,
+      bundlePolicy:"max-bundle",
+      rtcpMuxPolicy:"require"
+    },
+    pingInterval:5000
+  };
+  function send(m){if(coop.conn&&coop.conn.open){try{coop.conn.send(m);coop.lastTx=performance.now();return true}catch(e){}}return false}
+  function scheduleGuestReconnect(delay){
+    if(coop.host||!coop.roomCode||coop.reconnectTimer||coop.on)return;
+    const wait=Math.max(700,Math.min(8000,delay||1800));
+    coop.reconnectTimer=setTimeout(function(){
+      coop.reconnectTimer=null;
+      if(coop.on||coop.host||!coop.roomCode)return;
+      const code=coop.roomCode, attempt=Math.min(6,(coop.reconnectAttempts||0)+1);
+      if(!coop.peer||coop.peer.destroyed){
+        coop.connecting=false;
+        startGuestPeer(code);
+        return;
+      }
+      if(coop.peer.disconnected){
+        try{coop.peer.reconnect();}catch(e){
+          try{coop.peer.destroy();}catch(_e){}
+          coop.peer=null;
+          coop.connecting=false;
+          scheduleGuestReconnect(Math.min(8000,1200+(attempt*900)));
+          return;
+        }
+        setTimeout(function(){
+          if(!coop.on&&!coop.host&&coop.peer&&!coop.peer.destroyed&&!coop.peer.disconnected)connectToRoom(code,attempt);
+        },500);
+        return;
+      }
+      connectToRoom(code,attempt);
+    },wait);
+  }
+  function connectToRoom(code,attempt){
+    if(coop.host||coop.on||coop.connecting||!coop.peer||coop.peer.destroyed)return;
+    coop.connecting=true; coop.reconnectAttempts=attempt||0;
+    try{
+      const c=coop.peer.connect(code,{reliable:true,serialization:"json",metadata:{v:4}});
+      setupConnection(c);
+      setTimeout(function(){
+        if(!coop.on&&coop.connecting){coop.connecting=false;try{if(c&&!c.open)c.close()}catch(e){}scheduleGuestReconnect(Math.min(8000,1200+((attempt||0)*900)));}
+      },5000);
+    }catch(e){coop.connecting=false;scheduleGuestReconnect(Math.min(8000,1200+((attempt||0)*900)));}
+  }
+  function setupConnection(c){
+    const gen=coop.generation;
+    if(coop.conn&&coop.conn!==c&&coop.conn.open){try{c.close()}catch(e){};return;}
+    coop.conn=c; coop.lastRx=performance.now();
+    c.on("open",function(){
+      if(gen!==coop.generation)return;
+      clearConnectTimer(); connectBusy=false; coop.connecting=false; coop.reconnectAttempts=0; reconnectBusy=false; coop.on=true;
+      say("🟢 Игрок подключён — соединение установлено");
+      const info=document.getElementById("coopInfo"); if(info)info.style.display="block";
+      send({t:"hello",role:coop.host?"host":"guest",v:3,ts:Date.now()});
+    });
+    c.on("data",function(m){
+      if(gen!==coop.generation)return;
+      coop.lastRx=performance.now();
+      try{
+        if(!m||typeof m!=="object")return;
+        if(m.t==="ping"){send({t:"pong",ts:m.ts});return;}
+        if(m.t==="pong")return;
+        if(m.t==="player"){
+          if(Number.isFinite(+m.stateSeq) && +m.stateSeq<=coop.lastStateSeq)return;
+          if(Number.isFinite(+m.stateSeq))coop.lastStateSeq=+m.stateSeq;
+          coop.remote=m;
+          if(!coop.host&&m.boss){
+            const b=m.boss;
+            remoteBossState.x=Number.isFinite(+b.x)?+b.x:remoteBossState.x;
+            remoteBossState.y=Number.isFinite(+b.y)?+b.y:remoteBossState.y;
+            remoteBossState.vx=Number.isFinite(+b.vx)?+b.vx:0;
+            remoteBossState.vy=Number.isFinite(+b.vy)?+b.vy:0;
+            remoteBossState.hp=Number.isFinite(+b.hp)?+b.hp:remoteBossState.hp;
+            remoteBossState.max=Number.isFinite(+b.max)?+b.max:remoteBossState.max;
+            if(remoteBossState.max>boss.max)boss.max=Math.min(3000,remoteBossState.max);
+            remoteBossState.angle=Number.isFinite(+b.angle)?+b.angle:remoteBossState.angle;
+            remoteBossState.targetX=Number.isFinite(+b.targetX)?+b.targetX:remoteBossState.targetX;
+            remoteBossState.targetY=Number.isFinite(+b.targetY)?+b.targetY:remoteBossState.targetY;
+            remoteBossState.receivedAt=performance.now();
+            remoteBossBuffer.push({t:remoteBossState.receivedAt,x:remoteBossState.x,y:remoteBossState.y,vx:remoteBossState.vx,vy:remoteBossState.vy,hp:remoteBossState.hp,max:remoteBossState.max});
+            if(remoteBossBuffer.length>REMOTE_BUFFER_MAX)remoteBossBuffer.splice(0,remoteBossBuffer.length-REMOTE_BUFFER_MAX);
+          }
+        }else if(m.t==="hit"&&coop.host){const d=Number(m.damage);if(Number.isFinite(d)&&d>0){boss.hp=Math.max(0,boss.hp-d);if(boss.hp<=0)handleBossDefeat();}}
+        else if(m.t==="pacman"&&coop.host){activatePacman(false);}
+        else if(m.t==="pacmanStart"&&!coop.host){
+          pacmanUnlocked=true;pacmanActive=true;pacmanEating=false;pacmanEatTimer=0;pacmanTimer=600;
+          pacmanStartX=Number.isFinite(+m.sx)?+m.sx:boss.x; pacmanStartY=Number.isFinite(+m.sy)?+m.sy:boss.y;
+          pacmanTargetX=Number.isFinite(+m.tx)?+m.tx:boss.x; pacmanTargetY=Number.isFinite(+m.ty)?+m.ty:boss.y;
+          pacmanRotation=Number.isFinite(+m.rot)?+m.rot:Math.atan2(pacmanTargetY-pacmanStartY,pacmanTargetX-pacmanStartX);
+          pacmanDeathSnapshot={x:Number.isFinite(+m.x)?+m.x:boss.x,y:Number.isFinite(+m.y)?+m.y:boss.y,vx:Number.isFinite(+m.vx)?+m.vx:0,vy:Number.isFinite(+m.vy)?+m.vy:0,angle:Number.isFinite(+m.angle)?+m.angle:0,targetX:Number.isFinite(+m.targetX)?+m.targetX:boss.x,targetY:Number.isFinite(+m.targetY)?+m.targetY:boss.y,sector:Number.isFinite(+m.sector)?+m.sector:0};
+          // Не обнуляем HP на гостевом клиенте: реальное здоровье босса определяет хост.
+        }
+        else if(m.t==="revive"&&coop.dead){coop.dead=false;lives=Math.max(1,Math.min(maxLives,3));ended=false;const ri=document.getElementById("reviveInfo");if(ri)ri.style.display="none";}
+      }catch(e){}
+    });
+    c.on("close",function(){
+      if(gen!==coop.generation)return;
+      if(coop.conn===c)coop.conn=null;
+      coop.on=false; coop.remote=null; coop.connecting=false;
+      const info=document.getElementById("coopInfo"); if(info)info.style.display="none";
+      say("🟠 Соединение потеряно — пытаемся восстановить…");
+      if(!coop.host) scheduleGuestReconnect(1000);
+    });
+    c.on("error",function(err){
+      if(gen!==coop.generation)return;
+      if(coop.conn===c)coop.conn=null;
+      coop.on=false; coop.connecting=false;
+      say("❌ Ошибка соединения: "+((err&&err.type)||"сеть")+". Повторяем…");
+      if(!coop.host) scheduleGuestReconnect(1200);
+    });
+  }
+  function createHost(code,attempt){
+    if(attempt>5){connectBusy=false;say("❌ Не удалось создать комнату. Попробуй ещё раз.");return;}
+    connectBusy=true;
+    say("⏳ Создаём комнату…");
+    let peer;
+    try{peer=new Peer(code,PEER_OPTIONS);}catch(e){say("❌ Браузер не поддерживает WebRTC.");connectBusy=false;return;}
+    coop.peer=peer; coop.host=true; coop.roomCode=code;
+    peer.on("open",function(id){roomInput.value=id;say("🟢 Комната создана. Код: "+id);connectBusy=false;});
+    peer.on("connection",function(c){if(coop.conn&&coop.conn.open){c.close();return;}setupConnection(c);});
+    peer.on("error",function(err){
+      const type=err&&err.type||"unknown";
+      if(type==="unavailable-id"){try{peer.destroy();}catch(e){};if(coop.peer===peer)coop.peer=null;connectBusy=true;createHost(makeCode20(),attempt+1);return;}
+      if(type==="network"||type==="server-error"||type==="socket-error"||type==="socket-closed"){
+        say("🟠 Связь с сервером потеряна — восстанавливаем комнату…");
+        if(coop.peer===peer&&!peer.destroyed){try{peer.destroy();}catch(e){}}
+        if(coop.peer===peer)coop.peer=null;
+        coop.generation++;
+        const retryGeneration=coop.generation;
+        setTimeout(function(){
+          if(retryGeneration===coop.generation&&coop.host&&!coop.on){connectBusy=true;createHost(code,attempt+1);}
+        },1000);
+        return;
+      }
+      say("❌ Ошибка комнаты: "+type);connectBusy=false;
+    });
+    peer.on("disconnected",function(){
+      if(coop.peer!==peer||peer.destroyed||reconnectBusy)return;
+      reconnectBusy=true;
+      const retryGeneration=coop.generation;
+      say("🟠 Сигнальный сервер временно недоступен — восстанавливаем…");
+      try{peer.reconnect();}catch(e){}
+      setTimeout(function(){
+        if(retryGeneration!==coop.generation||coop.peer!==peer||peer.destroyed)return;
+        if(!peer.disconnected){reconnectBusy=false;return;}
+        reconnectBusy=false;
+        try{peer.destroy();}catch(e){}
+        if(coop.peer===peer)coop.peer=null;
+        coop.generation++;
+        if(coop.host&&!coop.on){connectBusy=true;createHost(code,attempt+1);}
+      },4500);
+    });
+    
+  }
+  function host(){
+    if(connectBusy)return;
+    connectBusy=true;
+    destroyPeer();
+    coop.host=true;
+    let code=normalizeCode(roomInput.value);
+    if(code.length!==20)code=makeCode20();
+    roomInput.value=code;
+    if(!window.Peer){
+      loadPeerJS(function(){
+        if(!connectBusy||!coop.host)return;
+        createHost(code,1);
+      });
+      return;
+    }
+    createHost(code,1);
+  }
+  function startGuestPeer(code){
+    if(coop.host||coop.on||!code)return;
+    let peer;
+    try{peer=new Peer(PEER_OPTIONS);}catch(e){say("❌ WebRTC недоступен.");connectBusy=false;scheduleGuestReconnect(2000);return;}
+    coop.peer=peer; coop.roomCode=code; coop.connecting=false; reconnectBusy=false;
+    peer.on("open",function(){
+      reconnectBusy=false; coop.roomCode=code; coop.connecting=false;
+      connectToRoom(code,coop.reconnectAttempts||0);
+      clearConnectTimer();
+      connectTimer=setTimeout(function(){if(!coop.on){say("🟠 Не удалось соединиться — пробуем ещё раз…");connectBusy=false;scheduleGuestReconnect(900);}},12000);
+    });
+    peer.on("error",function(err){
+      const type=err&&err.type||"сеть";
+      if(type==="peer-unavailable"||type==="network"||type==="server-error"||type==="socket-error"||type==="socket-closed"||type==="webrtc"){
+        say("🟠 Сеть/комната временно недоступна — повторяем подключение…"); connectBusy=false;
+        if(coop.peer===peer&&!peer.destroyed){try{peer.destroy();}catch(e){}}
+        if(coop.peer===peer)coop.peer=null;
+        scheduleGuestReconnect(type==="peer-unavailable"?900:1800); return;
+      }
+      say("❌ Ошибка подключения: "+type);connectBusy=false;
+    });
+    peer.on("disconnected",function(){
+      if(coop.peer!==peer||peer.destroyed||reconnectBusy)return;
+      reconnectBusy=true;
+      const retryGeneration=coop.generation;
+      say("🟠 Сигнальный сервер временно недоступен — восстанавливаем…");
+      try{peer.reconnect();}catch(e){}
+      setTimeout(function(){
+        if(retryGeneration!==coop.generation||coop.peer!==peer||peer.destroyed)return;
+        if(!peer.disconnected){reconnectBusy=false;return;}
+        reconnectBusy=false;
+        try{peer.destroy();}catch(e){}
+        if(coop.peer===peer)coop.peer=null;
+        coop.connecting=false;
+        coop.generation++;
+        if(!coop.on&&!coop.host&&coop.roomCode)scheduleGuestReconnect(1200);
+      },4500);
+    });
+  }
+  function join(){
+    if(connectBusy)return;
+    const code=normalizeCode(roomInput.value);
+    if(code.length!==20){say("❌ Код должен содержать ровно 20 символов.");return;}
+    connectBusy=true;
+    destroyPeer();
+    coop.host=false;
+    say("⏳ Подключаемся…");
+    if(!window.Peer){
+      loadPeerJS(function(){
+        if(!connectBusy||coop.host)return;
+        startGuestPeer(code);
+      });
+      return;
+    }
+    startGuestPeer(code);
+  }
+  window.__openMultiplayer=function(e){if(e){e.preventDefault();e.stopPropagation();}open();};
+  if(mpBtn)mpBtn.onclick=window.__openMultiplayer;
+  if(closeBtn)closeBtn.onclick=function(e){if(e){e.preventDefault();e.stopPropagation();}close();};
+  if(hostBtn)hostBtn.onclick=function(e){e.preventDefault();e.stopPropagation();host();};
+  if(joinBtn)joinBtn.onclick=function(e){e.preventDefault();e.stopPropagation();join();};
+  if(roomInput)roomInput.addEventListener("input",function(){this.value=normalizeCode(this.value);});
+  window.__mpSendHit=function(damage){if(coop.on&&!coop.host)send({t:"hit",damage:Number(damage)||0});};
+  window.__mpSendPacman=function(){if(coop.on&&!coop.host)send({t:"pacman"});};
+  window.__mpBroadcastPacman=function(st){if(coop.on&&coop.host&&st)send({t:"pacmanStart",sx:pacmanStartX,sy:pacmanStartY,tx:pacmanTargetX,ty:pacmanTargetY,rot:pacmanRotation,x:st.x,y:st.y,vx:st.vx,vy:st.vy,angle:st.angle,targetX:st.targetX,targetY:st.targetY,sector:st.sector});};
+  window.__mpDrawRemote=function(ctx){const r=coop.remote;if(!coop.on||!r)return;ctx.save();ctx.globalAlpha=.8;ctx.fillStyle="#5ee7ff";ctx.beginPath();ctx.arc(r.x,r.y,9,0,Math.PI*2);ctx.fill();ctx.restore();};
+  setInterval(function(){
+    if(!coop.on||!coop.conn||!coop.conn.open)return;
+    send({t:"ping",ts:Date.now()});
+    if(coop.lastRx&&performance.now()-coop.lastRx>18000){
+      try{coop.conn.close()}catch(e){}
+    }
+  },5000);
+  setInterval(function(){
+    if(!coop.on)return;
+    send({t:"player",stateSeq:++coop.stateSeq,x:player.x,y:player.y,lives:lives,score:score,dead:!!coop.dead,boss:{x:boss.x,y:boss.y,vx:boss.vx,vy:boss.vy,hp:boss.hp,max:boss.max,angle:(boss.ai&&Number.isFinite(boss.ai.angle))?boss.ai.angle:0,targetX:(boss.ai&&Number.isFinite(boss.ai.targetX))?boss.ai.targetX:boss.x,targetY:(boss.ai&&Number.isFinite(boss.ai.targetY))?boss.ai.targetY:boss.y,frame:frame,sentAt:Date.now()}});
+  },60);
+  setInterval(function(){
+    if(!coop.on||!coop.remote||coop.dead)return;
+    const ri=document.getElementById("reviveInfo");
+    if(coop.remote.dead){const dx=player.x-coop.remote.x,dy=player.y-coop.remote.y;if(Math.hypot(dx,dy)<=85){coop.reviveFrames=Math.min(300,coop.reviveFrames+1);const sec=Math.max(0,5-Math.floor(coop.reviveFrames/60));if(ri){ri.textContent="❤️ Воскрешение союзника: "+sec+" сек";ri.style.display="block";}if(coop.reviveFrames>=300){coop.reviveFrames=0;send({t:"revive"});}}else coop.reviveFrames=0;}else{coop.reviveFrames=0;if(ri)ri.style.display="none";}
+  },1000/60);
+})();
+</script>
+
+<audio id="bgMusic" preload="auto" loop playsinline crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
+<script id="final-audio-controls">
+(function(){
+const music=document.getElementById("bgMusic"),settings=document.getElementById("settingsPanel"),gear=document.getElementById("settingsBtn");
+const musicBtn=document.getElementById("musicBtn"),sfxBtn=document.getElementById("sfxBtn"),builtInBtn=document.getElementById("builtInMusicBtn"),onlineBtn=document.getElementById("onlineMusicBtn");
+const urlInput=document.getElementById("musicUrl"),musicFile=document.getElementById("musicFile"),musicFileName=document.getElementById("musicFileName"),applyBtn=document.getElementById("applyMusicBtn"),closeBtn=document.getElementById("settingsClose"),musicSearch=document.getElementById("musicSearch"),musicSearchBtn=document.getElementById("musicSearchBtn"),musicSearchStatus=document.getElementById("musicSearchStatus");
+let musicOn=true,sfxOn=true,ac=null,musicMode=storedMusicMode(),localMusicUrl="",musicSearchBusy=false;
+const activeSfxNodes=[];
+window.__sfxPaused=false;
+window.__stopSfx=function(){while(activeSfxNodes.length){const n=activeSfxNodes.pop();try{n.stop()}catch(e){}}};
+window.__resumeSfx=function(){if(!sfxOn||window.__sfxPaused)return;try{if(ac&&ac.state==="suspended"){var rp=ac.resume();if(rp&&rp.catch)rp.catch(function(){})}}catch(e){}};
+const MUSIC_DB="KosmicheskayaBitvaMusic",MUSIC_STORE="files",MUSIC_KEY="current";
+function saveMusicMode(mode){try{localStorage.setItem("kb_music_mode",mode)}catch(e){}}
+function saveOnlineMusicUrl(url){try{localStorage.setItem("kb_music_online_url",url||"")}catch(e){}}
+function storedOnlineMusicUrl(){try{return localStorage.getItem("kb_music_online_url")||""}catch(e){return ""}}
+function storedMusicMode(){try{return localStorage.getItem("kb_music_mode")||"builtin"}catch(e){return "builtin"}}
+function openMusicDB(){return new Promise(function(resolve,reject){if(!window.indexedDB){reject(new Error("IndexedDB unavailable"));return}const r=indexedDB.open(MUSIC_DB,1);r.onupgradeneeded=function(){if(!r.result.objectStoreNames.contains(MUSIC_STORE))r.result.createObjectStore(MUSIC_STORE)};r.onsuccess=function(){resolve(r.result)};r.onerror=function(){reject(r.error||new Error("DB error"))}})}
+async function saveLocalMusic(file,name){let db=null;try{db=await openMusicDB();await new Promise(function(res,rej){const tx=db.transaction(MUSIC_STORE,"readwrite");tx.objectStore(MUSIC_STORE).put({blob:file,name:name||file.name||"music"},MUSIC_KEY);tx.oncomplete=res;tx.onerror=function(){rej(tx.error||new Error("DB write error"))};tx.onabort=function(){rej(tx.error||new Error("DB transaction aborted"))}});return true}catch(e){return false}finally{if(db)try{db.close()}catch(_e){}}}
+async function restoreLocalMusic(){if(musicMode!=="local")return false;try{const db=await openMusicDB();const data=await new Promise(function(res,rej){const tx=db.transaction(MUSIC_STORE,"readonly");const r=tx.objectStore(MUSIC_STORE).get(MUSIC_KEY);r.onsuccess=function(){res(r.result||null)};r.onerror=function(){rej(r.error)}});db.close();if(!data||!data.blob)return false;if(localMusicUrl)URL.revokeObjectURL(localMusicUrl);localMusicUrl=URL.createObjectURL(data.blob);musicMode="local";music.src=localMusicUrl;music.load();if(musicFileName)musicFileName.textContent="Сохранено: "+(data.name||"ваша музыка");updateAudioUI();return true}catch(e){return false}}
+async function restoreOnlineMusic(){if(musicMode!=="online")return false;const saved=storedOnlineMusicUrl();if(!/^https?:\/\//i.test(saved))return false;urlInput.value=saved;music.src=saved;music.load();updateAudioUI();return true}
+async function searchMusicByName(){if(musicSearchBusy)return;const term=(musicSearch&&musicSearch.value||"").trim();if(!term){if(musicSearchStatus)musicSearchStatus.textContent="Введи название песни или исполнителя.";return}musicSearchBusy=true;if(musicSearchBtn)musicSearchBtn.disabled=true;if(musicSearchStatus)musicSearchStatus.textContent="🔎 Ищу песню…";try{const data=await new Promise(function(resolve,reject){var cb="kbMusicSearch_"+Date.now()+"_"+Math.floor(Math.random()*100000);var script=document.createElement("script");var done=false;var timer=setTimeout(function(){if(done)return;done=true;cleanup();reject(new Error("timeout"))},12000);function cleanup(){clearTimeout(timer);try{delete window[cb]}catch(e){window[cb]=undefined}if(script.parentNode)script.parentNode.removeChild(script)}window[cb]=function(payload){if(done)return;done=true;cleanup();resolve(payload||{})};script.onerror=function(){if(done)return;done=true;cleanup();reject(new Error("network"))};script.src="https://itunes.apple.com/search?term="+encodeURIComponent(term)+"&entity=song&media=music&limit=5&callback="+cb;document.head.appendChild(script)});const item=(data.results||[]).find(function(x){return x.previewUrl});if(!item)throw new Error("preview not found");musicMode="online";saveMusicMode("online");saveOnlineMusicUrl(item.previewUrl);urlInput.value=item.previewUrl;music.src=item.previewUrl;music.load();if(musicSearchStatus)musicSearchStatus.textContent="🎵 Найдено: "+(item.trackName||term)+" — "+(item.artistName||"")+". Доступно официальное превью.";updateAudioUI();unlockAndPlay()}catch(e){if(musicSearchStatus)musicSearchStatus.textContent="Не удалось найти песню. Проверь название или попробуй ещё раз."}finally{musicSearchBusy=false;if(musicSearchBtn)musicSearchBtn.disabled=false}}
+function audioReady(){
+  if(!sfxOn)return null;
+  try{
+    ac=ac||new(window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==="suspended"){var rp=ac.resume();if(rp&&rp.catch)rp.catch(function(){});}
+    return ac;
+  }catch(e){return null}
+}
+function tone(f0,f1,d,type,vol,delay){
+  const c=audioReady();if(!c)return;
+  try{
+    const now=c.currentTime+(delay||0),o=c.createOscillator(),g=c.createGain();
+    o.type=type||"sine";o.frequency.setValueAtTime(Math.max(20,f0),now);
+    if(f1!==undefined)o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),now+d);
+    g.gain.setValueAtTime(Math.max(.0001,vol||.03),now);g.gain.exponentialRampToValueAtTime(.0001,now+d);
+    o.connect(g);g.connect(c.destination);
+    activeSfxNodes.push(o);
+    o.onended=function(){const i=activeSfxNodes.indexOf(o);if(i>=0)activeSfxNodes.splice(i,1)};
+    o.start(now);o.stop(now+d+.02);
+  }catch(e){}
+}
+function noise(d,vol,filterFreq){
+  const c=audioReady();if(!c)return;
+  try{
+    const n=Math.max(1,Math.floor(c.sampleRate*d)),b=c.createBuffer(1,n,c.sampleRate),a=b.getChannelData(0);
+    for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);
+    const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),now=c.currentTime;
+    f.type="bandpass";f.frequency.value=filterFreq||900;f.Q.value=.8;g.gain.setValueAtTime(vol||.03,now);g.gain.exponentialRampToValueAtTime(.0001,now+d);
+    s.buffer=b;s.connect(f);f.connect(g);g.connect(c.destination);
+    activeSfxNodes.push(s);
+    s.onended=function(){const i=activeSfxNodes.indexOf(s);if(i>=0)activeSfxNodes.splice(i,1)};
+    s.start(now);s.stop(now+d+.02);
+  }catch(e){}
+}
+function playerShotSfx(){if(!sfxOn||window.__sfxPaused)return;tone(720,1180,.045,"square",.028);tone(1440,900,.035,"triangle",.012,.008)}
+function bossShotSfx(){if(!sfxOn||window.__sfxPaused)return;tone(170,72,.12,"sawtooth",.045);noise(.075,.018,420)}
+function dashSfx(){tone(260,980,.16,"sawtooth",.035);tone(900,180,.13,"triangle",.018,.015);noise(.12,.018,1600)}
+function playerHitSfx(){tone(180,70,.20,"sawtooth",.055);tone(420,120,.13,"square",.022,.015);noise(.10,.025,520)}
+function bossHitSfx(){tone(260,620,.055,"triangle",.024);tone(760,430,.07,"square",.014,.012)}
+function shieldSfx(){tone(520,1040,.16,"sine",.028);tone(1040,620,.18,"sine",.018,.035)}
+function upgradeSfx(){tone(440,660,.10,"sine",.025);tone(660,990,.11,"sine",.022,.09);tone(990,1320,.16,"triangle",.018,.18)}
+function bossDeathSfx(){tone(180,55,.55,"sawtooth",.055);tone(360,90,.48,"triangle",.035,.06);tone(540,120,.42,"square",.022,.12);noise(.45,.035,180)}
+window.gameAudio={
+  shot:function(){playerShotSfx()},
+  bossShot:function(){bossShotSfx()},
+  dash:function(){dashSfx()},
+  playerHit:function(){playerHitSfx()},
+  bossHit:function(){bossHitSfx()},
+  shield:function(){shieldSfx()},
+  upgrade:function(){upgradeSfx()},
+  bossDeath:function(){bossDeathSfx()},
+  unlock:function(){unlockAndPlay()}
+};
+function beep(f,d,t,v){tone(f,f,d,t,v)}
+function updateAudioUI(){if(musicBtn)musicBtn.textContent=musicOn?"🎵 Музыка: ВКЛ":"🔇 Музыка: ВЫКЛ";if(sfxBtn)sfxBtn.textContent=sfxOn?"🔊 Звуки: ВКЛ":"🔇 Звуки: ВЫКЛ";if(builtInBtn)builtInBtn.classList.toggle("active",musicMode==="builtin");if(onlineBtn)onlineBtn.classList.toggle("active",musicMode==="online");if(musicFileName)musicFileName.classList.toggle("active",musicMode==="local")}
+function playMusic(){if(!musicOn)return;music.muted=false;const p=music.play();if(p&&p.catch)p.catch(function(){})}
+function unlockAndPlay(){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume()}catch(e){}playMusic()}
+function pauseSettings(){window.__setUIPause("settings",true);if(settings){settings.style.display="grid";settings.style.pointerEvents="auto"}}
+function closeSettings(){if(settings)settings.style.display="none";window.__clearUIPause("settings");syncUtilityButtons()}
+function syncUtilityButtons(){const up=document.getElementById("upgradeMenu"),co=document.getElementById("confirmUpgrade"),mp=document.getElementById("mpPanel"),set=document.getElementById("settingsPanel");const hidden=(up&&getComputedStyle(up).display!=="none")||(co&&getComputedStyle(co).display!=="none");if(gear)gear.style.display=hidden?"none":"block";const mb=document.getElementById("mpBtn");if(mb)mb.style.display=hidden?"none":"block"}
+window.syncUtilityButtons=syncUtilityButtons;
+window.__openGameSettings=function(e){if(e){e.preventDefault();e.stopPropagation()}pauseSettings();syncUtilityButtons()};
+if(gear)gear.onclick=window.__openGameSettings;
+if(closeBtn)closeBtn.onclick=function(e){e.preventDefault();e.stopPropagation();closeSettings()};
+if(settings)settings.onclick=function(e){if(e.target===settings)closeSettings()};
+if(musicBtn)musicBtn.onclick=function(e){e.stopPropagation();musicOn=!musicOn;if(musicOn)unlockAndPlay();else music.pause();updateAudioUI()};
+if(sfxBtn)sfxBtn.onclick=function(e){e.stopPropagation();sfxOn=!sfxOn;updateAudioUI();if(sfxOn)beep(700,.04,"sine",.03)};
+if(builtInBtn)builtInBtn.onclick=function(e){e.stopPropagation();musicMode="builtin";saveMusicMode("builtin");saveOnlineMusicUrl("");music.src="music.mp3";music.load();updateAudioUI();unlockAndPlay()};
+if(onlineBtn)onlineBtn.onclick=function(e){e.stopPropagation();musicMode="online";saveMusicMode("online");const saved=storedOnlineMusicUrl();if(saved){urlInput.value=saved;music.src=saved;music.load();unlockAndPlay()}updateAudioUI()};
+if(musicFile)musicFile.onchange=async function(){const f=musicFile.files&&musicFile.files[0];if(!f)return;if(!f.type.startsWith("audio/")&&!/\.(mp3|ogg|wav|m4a|aac)$/i.test(f.name)){alert("Выбери аудиофайл (MP3, OGG, WAV, M4A или AAC).");musicFile.value="";return}const saved=await saveLocalMusic(f,f.name);if(!saved){alert("Не удалось сохранить музыку в браузере. Попробуй ещё раз или используй другой файл.");return}if(localMusicUrl)URL.revokeObjectURL(localMusicUrl);localMusicUrl=URL.createObjectURL(f);musicMode="local";saveMusicMode("local");saveOnlineMusicUrl("");if(musicFileName)musicFileName.textContent="Сохранено: "+f.name;music.src=localMusicUrl;music.load();updateAudioUI();unlockAndPlay()};
+if(musicSearchBtn)musicSearchBtn.onclick=function(e){e.stopPropagation();searchMusicByName()};
+if(musicSearch)musicSearch.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();searchMusicByName()}});
+if(applyBtn)applyBtn.onclick=function(e){e.stopPropagation();const u=(urlInput.value||"").trim();if(musicMode==="local"){if(!localMusicUrl){alert("Сначала выбери музыкальный файл.");return}}else if(musicMode==="online"){if(!/^https?:\/\//i.test(u)){alert("Вставь прямую ссылку на аудиофайл.");return}saveMusicMode("online");saveOnlineMusicUrl(u);music.src=u;music.load()}else{saveMusicMode("builtin");saveOnlineMusicUrl("");music.src="music.mp3";music.load()}unlockAndPlay()};
+music.loop=true;music.preload="auto";
+function begin(){unlockAndPlay()}
+
+// Не менять src/currentTime и не останавливать музыку при поражении: выбранный файл живёт до перезагрузки страницы.
+updateAudioUI();window.__beginGameAudio=begin;
+// GitHub Pages/mobile browsers block autoplay until a user gesture.
+// Start music on the first interaction while keeping the game itself playable.
+window.addEventListener("pointerdown",function(){try{begin()}catch(e){}},{once:true,passive:true});
+window.addEventListener("touchstart",function(){try{begin()}catch(e){}},{once:true,passive:true});
+restoreLocalMusic().then(function(ok){if(ok && musicOn)return playMusic();return restoreOnlineMusic().then(function(restored){if(restored && musicOn){/* wait for user gesture */}})});
+})();
+</script>
+
+<script id="utility-visibility">
+(function(){
+  function sync(){ if(window.syncUtilityButtons) window.syncUtilityButtons(); }
+  var a=document.getElementById("upgradeMenu"), b=document.getElementById("confirmUpgrade");
+  if(window.MutationObserver){
+    [a,b].forEach(function(el){ if(el) new MutationObserver(sync).observe(el,{attributes:true,attributeFilter:["style","class"]}); });
+  }
+  setTimeout(sync,0);
+})();
+</script>
+<img id="pacmanAsset" alt="Pac-Man" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjkyIiBmaWxsPSIjRkZEOTJGIi8+PGNpcmNsZSBjeD0iMTIyIiBjeT0iNTUiIHI9IjEyIiBmaWxsPSIjMTExIi8+PC9zdmc+" style="position:fixed;width:1px;height:1px;left:-10px;top:-10px;opacity:0;pointer-events:none;z-index:-1">
+<img id="pacmanEatAsset" alt="Pac-Man eating" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cGF0aCBkPSJNMTAwIDEwMCBMMTg4IDQ4IEExMDAgMTAwIDAgMSAwIDE4OCAxNTIgWiIgZmlsbD0iI0ZGRDkyRiIvPjxjaXJjbGUgY3g9IjExMiIgY3k9IjUyIiByPSIxMiIgZmlsbD0iIzExMSIvPjwvc3ZnPg==" style="position:fixed;width:1px;height:1px;left:-10px;top:-10px;opacity:0;pointer-events:none;z-index:-1">
+</body>
+</html>
